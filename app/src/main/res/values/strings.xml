@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Khana Peena</string>
+
+    <!-- Error Messages for Volley-->
+    <string name="error_time_out">Seems the connection timed out</string>
+    <string name="error_network">Please check your network</string>
+    <string name="error_tech">Seems there\'s an error at our end</string>
+</resources>
