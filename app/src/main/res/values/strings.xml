@@ -5,4 +5,11 @@
     <string name="error_time_out">Seems the connection timed out</string>
     <string name="error_network">Please check your network</string>
     <string name="error_tech">Seems there\'s an error at our end</string>
+
+
+    <string name="train_name_or_number">Train Name or Number</string>
+    <string name="meal_station">Meal Station</string>
+    <string name="date">Date</string>
+    <string name="proceed">Proceed</string>
+    <string name="header_text">Some details please so that we can serve you better!!!</string>
 </resources>
