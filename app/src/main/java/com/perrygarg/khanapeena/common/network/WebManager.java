@@ -1,6 +1,7 @@
 package com.perrygarg.khanapeena.common.network;
 
 import com.perrygarg.khanapeena.application.MyApplication;
+import com.perrygarg.khanapeena.home.service.TrainAutoCompleteService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +22,8 @@ public class WebManager {
     {
         switch (taskCode)
         {
-            //ToDo: Write code to return service based on taskCode
+            case WebConstants.WS_CODE_TRAIN_AUTOCOMPLETE:
+                return new TrainAutoCompleteService(taskCode, serviceListener);
         }
 
         return null;

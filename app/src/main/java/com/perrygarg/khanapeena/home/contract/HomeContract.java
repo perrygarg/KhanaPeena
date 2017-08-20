@@ -6,16 +6,18 @@ package com.perrygarg.khanapeena.home.contract;
 
 public interface HomeContract {
 
-    interface HomeView {
+    interface View {
         void showProgress();
         void hideProgress();
         void showError(String errMsg);
 
         void onAutocompleteTrainSuccess();
+
+        void fetchAutoCompleteTrainList(String partialTrainInfo);
     }
 
-    interface HomePresenter {
-        void autocompleteTrain(String partialTrainInfo);
+    interface Presenter {
+        void fetchAutoCompleteTrainList(String partialTrainInfo);
     }
 
 }

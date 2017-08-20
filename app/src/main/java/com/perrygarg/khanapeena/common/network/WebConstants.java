@@ -1,0 +1,23 @@
+package com.perrygarg.khanapeena.common.network;
+
+/**
+ * Created by perry.garg on 30/01/17.
+ */
+
+public interface WebConstants {
+
+    /**
+     * Web Service Task Codes
+     */
+    int WS_CODE_TRAIN_AUTOCOMPLETE = 1;
+
+    String RAIL_API_KEY = "/apikey/m4h2fi5539";
+
+    /**
+     * Web Service URLs
+     */
+    //String BASE_URL = ""; //Production Server
+    String BASE_URL_RAIL_API = "http://api.railwayapi.com/";
+    //String URL_LOGIN = BASE_URL + "v1/business/login";
+    String URL_TRAIN_AUTOCOMPLETE = BASE_URL_RAIL_API + "v2/suggest-train/train/";
+}
