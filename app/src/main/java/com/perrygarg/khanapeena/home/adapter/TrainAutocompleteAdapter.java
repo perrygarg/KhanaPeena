@@ -25,7 +25,8 @@ public class TrainAutocompleteAdapter extends BaseAdapter implements Filterable 
     private static final int MAX_RESULTS = 6;
     private Context mContext;
     private HomeContract.View view;
-    private List<Train> resultList = new ArrayList<Train>();
+    private List<Train> resultList = new ArrayList();
+    private boolean trainSelected;
 
     public TrainAutocompleteAdapter(Context context, HomeContract.View view) {
         mContext = context;
@@ -34,7 +35,6 @@ public class TrainAutocompleteAdapter extends BaseAdapter implements Filterable 
 
     public void setTrainsListInstance(List<Train> trains) {
         resultList = trains;
-
     }
 
     @Override
@@ -71,7 +71,16 @@ public class TrainAutocompleteAdapter extends BaseAdapter implements Filterable 
             protected FilterResults performFiltering(CharSequence constraint) {
                 FilterResults filterResults = new FilterResults();
                 if (constraint != null) {
+                    if(!trainSelected)
                     view.fetchAutoCompleteTrainList(constraint.toString());
+
+                    if(resultList.size() > 0) {
+                        for (Train train : resultList) {
+                            if(!train.trainNumber.startsWith(constraint.toString())) {
+                                resultList.remove(train);
+                            }
+                        }
+                    }
 
                     // Assign the data to the FilterResults
                     filterResults.values = resultList;
@@ -92,16 +101,7 @@ public class TrainAutocompleteAdapter extends BaseAdapter implements Filterable 
         return filter;
     }
 
-    private List<Train> findTrains(Context mContext, String s) {
-        List<Train> trains = new ArrayList<>();
-        Train train = new Train();
-        train.trainName = "dummy1";
-        train.trainNumber = "12345";
-        trains.add(train);
-        Train train1 = new Train();
-        train1.trainName = "dummy2";
-        train1.trainNumber = "23456";
-        trains.add(train1);
-        return trains;
+    public void itemSelected(boolean b) {
+        this.trainSelected = b;
     }
 }

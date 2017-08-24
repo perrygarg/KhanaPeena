@@ -32,7 +32,8 @@ public class TrainAutoCompleteService extends WebService {
     @Override
     public void onResponse(Object object)
     {
-        Log.d("","");
+        TrainAutoCompleteResponse response = (TrainAutoCompleteResponse) object;
+        serviceListener.onServiceSuccess(response, WebConstants.WS_CODE_TRAIN_AUTOCOMPLETE);
     }
 
 }

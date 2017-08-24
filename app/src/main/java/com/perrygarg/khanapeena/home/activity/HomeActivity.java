@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.ProgressBar;
 
 import com.perrygarg.khanapeena.R;
 import com.perrygarg.khanapeena.common.activity.BaseActivity;
@@ -21,6 +22,8 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
     DelayAutocompleteTextView train;
     AutoCompleteTextView station;
     HomePresenter homePresenter;
+    TrainAutocompleteAdapter adapter;
+    ProgressBar trainProgress, mealStationProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,34 +37,20 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
         homePresenter = new HomePresenter(this);
 
         train.setThreshold(3);
-        final TrainAutocompleteAdapter adapter = new TrainAutocompleteAdapter(this, this);
+        adapter = new TrainAutocompleteAdapter(this, this);
         train.setAdapter(adapter);
 //        bookTitle.setLoadingIndicator(
 //                (android.widget.ProgressBar) findViewById(R.id.pb_loading_indicator));
         train.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                adapter.itemSelected(true);
                 Train train1 = (Train) adapterView.getItemAtPosition(position);
                 train.setText(train1.trainName);
             }
         });
 
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                List<Train> trains = new ArrayList<>();
-                Train train = new Train();
-                train.trainName = "dummy1";
-                train.trainNumber = "12345";
-                trains.add(train);
-                Train train1 = new Train();
-                train1.trainName = "dummy2";
-                train1.trainNumber = "23456";
-                trains.add(train1);
-adapter.setTrainsListInstance(trains);
-            }
-        }, 5000);
+//        adapter.setTrainsListInstance(trains);
 
     }
 
@@ -72,16 +61,18 @@ adapter.setTrainsListInstance(trains);
     private void findViewsByIds() {
         train = (DelayAutocompleteTextView) findViewById(R.id.train);
         station = (AutoCompleteTextView) findViewById(R.id.meal_station);
+        trainProgress = (ProgressBar) findViewById(R.id.train_progress_bar);
+        mealStationProgress = (ProgressBar) findViewById(R.id.meal_station_progress_bar);
     }
 
     @Override
     public void showProgress() {
-
+        trainProgress.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideProgress() {
-
+        trainProgress.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -90,8 +81,9 @@ adapter.setTrainsListInstance(trains);
     }
 
     @Override
-    public void onAutocompleteTrainSuccess() {
-
+    public void onAutocompleteTrainSuccess(ArrayList<Train> trainArrayList) {
+        adapter.setTrainsListInstance(trainArrayList);
+        train.showDropDown();
     }
 
     @Override

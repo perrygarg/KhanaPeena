@@ -52,5 +52,6 @@ public class DelayAutocompleteTextView extends AutoCompleteTextView {
 //            mLoadingIndicator.setVisibility(View.GONE);
 //        }
         super.onFilterComplete(count);
+//        showDropDown();
     }
 }

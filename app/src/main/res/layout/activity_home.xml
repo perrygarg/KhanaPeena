@@ -49,13 +49,32 @@
                     android:layout_margin="5dp"
                     android:textSize="8dp">
 
-                    <com.perrygarg.khanapeena.common.util.DelayAutocompleteTextView
-                        android:id="@+id/train"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/train_name_or_number"
-                        android:singleLine="true"
-                        android:textSize="14dp" />
+                        android:orientation="horizontal"
+                        android:padding="2dp"
+                        android:weightSum="1">
+
+                        <com.perrygarg.khanapeena.common.util.DelayAutocompleteTextView
+                            android:id="@+id/train"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="@string/train_name_or_number"
+                            android:layout_gravity="center_vertical"
+                            android:singleLine="true"
+                            android:textSize="14dp" />
+
+                        <ProgressBar
+                            android:id="@+id/train_progress_bar"
+                            android:layout_width="30dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_height="30dp"
+                            android:visibility="invisible" />
+
+                    </LinearLayout>
+
                 </android.support.design.widget.TextInputLayout>
 
                 <android.support.design.widget.TextInputLayout xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -64,13 +83,32 @@
                     android:layout_margin="5dp"
                     android:textSize="8dp">
 
-                    <AutoCompleteTextView
-                        android:id="@+id/meal_station"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/meal_station"
-                        android:singleLine="true"
-                        android:textSize="14dp" />
+                        android:orientation="horizontal"
+                        android:padding="2dp"
+                        android:weightSum="1">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/meal_station"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight="1"
+                            android:hint="@string/meal_station"
+                            android:singleLine="true"
+                            android:textSize="14dp" />
+
+                        <ProgressBar
+                            android:id="@+id/meal_station_progress_bar"
+                            android:layout_width="30dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_height="30dp"
+                            android:visibility="invisible" />
+
+                    </LinearLayout>
+
                 </android.support.design.widget.TextInputLayout>
 
                 <android.support.design.widget.TextInputLayout xmlns:app="http://schemas.android.com/apk/res-auto"
