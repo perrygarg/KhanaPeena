@@ -10,6 +10,7 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.perrygarg.khanapeena.R;
+import com.perrygarg.khanapeena.common.util.DelayAutocompleteTextView;
 import com.perrygarg.khanapeena.home.model.Train;
 import com.perrygarg.khanapeena.home.contract.HomeContract;
 
@@ -26,7 +27,7 @@ public class TrainAutocompleteAdapter extends BaseAdapter implements Filterable 
     private Context mContext;
     private HomeContract.View view;
     private List<Train> resultList = new ArrayList();
-    private boolean trainSelected;
+    private Train trainSelected;
 
     public TrainAutocompleteAdapter(Context context, HomeContract.View view) {
         mContext = context;
@@ -71,16 +72,23 @@ public class TrainAutocompleteAdapter extends BaseAdapter implements Filterable 
             protected FilterResults performFiltering(CharSequence constraint) {
                 FilterResults filterResults = new FilterResults();
                 if (constraint != null) {
-                    if(!trainSelected)
-                    view.fetchAutoCompleteTrainList(constraint.toString());
 
-                    if(resultList.size() > 0) {
-                        for (Train train : resultList) {
-                            if(!train.trainNumber.startsWith(constraint.toString())) {
-                                resultList.remove(train);
-                            }
+                    if(trainSelected != null) {
+                        if(!trainSelected.trainName.equals(constraint.toString())) {
+                            trainSelected = null;
+                            view.fetchAutoCompleteTrainList(constraint.toString());
                         }
+                    } else {
+                        view.fetchAutoCompleteTrainList(constraint.toString());
                     }
+
+//                    if(resultList.size() > 0) {
+//                        for (Train train : resultList) {
+//                            if(!train.trainNumber.startsWith(constraint.toString())) {
+//                                resultList.remove(train);
+//                            }
+//                        }
+//                    }
 
                     // Assign the data to the FilterResults
                     filterResults.values = resultList;
@@ -101,7 +109,7 @@ public class TrainAutocompleteAdapter extends BaseAdapter implements Filterable 
         return filter;
     }
 
-    public void itemSelected(boolean b) {
+    public void itemSelected(Train b) {
         this.trainSelected = b;
     }
 }

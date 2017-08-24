@@ -43,39 +43,33 @@
                     android:text="@string/header_text"
                     android:textSize="16dp" />
 
-                <android.support.design.widget.TextInputLayout xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:layout_width="match_parent"
+                <FrameLayout android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:textSize="8dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="2dp"
-                        android:weightSum="1">
+                    android:layout_margin="@dimen/cardview_default_radius">
 
                         <com.perrygarg.khanapeena.common.util.DelayAutocompleteTextView
                             android:id="@+id/train"
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
+                            android:inputType="textCapSentences"
                             android:hint="@string/train_name_or_number"
                             android:layout_gravity="center_vertical"
-                            android:singleLine="true"
-                            android:textSize="14dp" />
+                            android:maxLines="1"
+                            android:textSize="14dp"
+                            android:paddingRight="@dimen/margin_left_home"
+                            android:imeOptions="flagNoExtractUi|actionSearch"/>
 
                         <ProgressBar
                             android:id="@+id/train_progress_bar"
-                            android:layout_width="30dp"
-                            android:layout_gravity="center_vertical"
-                            android:layout_height="30dp"
+                            style="?android:attr/progressBarStyleSmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|right"
+                            android:layout_marginRight="@dimen/cardview_default_radius"
                             android:visibility="invisible" />
 
-                    </LinearLayout>
 
-                </android.support.design.widget.TextInputLayout>
+                </FrameLayout>
 
                 <android.support.design.widget.TextInputLayout xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="match_parent"

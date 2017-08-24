@@ -44,9 +44,9 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
         train.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                adapter.itemSelected(true);
                 Train train1 = (Train) adapterView.getItemAtPosition(position);
                 train.setText(train1.trainName);
+                adapter.itemSelected(train1);
             }
         });
 
@@ -87,7 +87,12 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
     }
 
     @Override
-    public void fetchAutoCompleteTrainList(String partialTrainInfo) {
-        homePresenter.fetchAutoCompleteTrainList(partialTrainInfo);
+    public void fetchAutoCompleteTrainList(final String partialTrainInfo) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                homePresenter.fetchAutoCompleteTrainList(partialTrainInfo);
+            }
+        });
     }
 }
