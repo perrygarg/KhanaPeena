@@ -4,7 +4,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
-        applicationId "com.perrygarg.khanapeena"
+        applicationId "com.khanapeena.androidapp"
         minSdkVersion 19
         targetSdkVersion 25
         versionCode 1
@@ -33,3 +33,4 @@ dependencies {
     compile 'com.google.code.gson:gson:2.4'
     testCompile 'junit:junit:4.12'
 }
+apply plugin: 'com.google.gms.google-services'

@@ -41,7 +41,7 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
         Train[] trains = ((TrainAutoCompleteResponse)masterResponse).train;
         int totalTrains = ((TrainAutoCompleteResponse)masterResponse).total;
         if(totalTrains > 5) {
-            totalTrains = 5;
+//            totalTrains = 5;
         }
         ArrayList<Train> trainList = new ArrayList<>();
         for (int i = 0; i < totalTrains; i++) {

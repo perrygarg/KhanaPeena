@@ -71,7 +71,7 @@ public class TrainAutocompleteAdapter extends BaseAdapter implements Filterable 
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
                 FilterResults filterResults = new FilterResults();
-                if (constraint != null) {
+                if (constraint != null && !constraint.toString().isEmpty()) {
 
                     if(trainSelected != null) {
                         if(!trainSelected.trainName.equals(constraint.toString())) {
