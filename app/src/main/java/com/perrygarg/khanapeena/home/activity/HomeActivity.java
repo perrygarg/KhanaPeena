@@ -1,7 +1,6 @@
 package com.perrygarg.khanapeena.home.activity;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
@@ -16,7 +15,6 @@ import com.perrygarg.khanapeena.home.contract.HomeContract;
 import com.perrygarg.khanapeena.home.presenter.HomePresenter;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class HomeActivity extends BaseActivity implements HomeContract.View {
     DelayAutocompleteTextView train;
@@ -52,6 +50,12 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
 
 //        adapter.setTrainsListInstance(trains);
 
+        fetchServingStationsFromFirebase();
+
+    }
+
+    private void fetchServingStationsFromFirebase() {
+        homePresenter.fetchServingStations();
     }
 
     private void init() {

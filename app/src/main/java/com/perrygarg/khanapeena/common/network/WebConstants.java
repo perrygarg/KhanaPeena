@@ -10,6 +10,7 @@ public interface WebConstants {
      * Web Service Task Codes
      */
     int WS_CODE_TRAIN_AUTOCOMPLETE = 1;
+    int FETCH_SERVING_STATIONS_SERVICE = 2;
 
     String RAIL_API_KEY = "/apikey/m4h2fi5539";
 
@@ -20,4 +21,7 @@ public interface WebConstants {
     String BASE_URL_RAIL_API = "http://api.railwayapi.com/";
     //String URL_LOGIN = BASE_URL + "v1/business/login";
     String URL_TRAIN_AUTOCOMPLETE = BASE_URL_RAIL_API + "v2/suggest-train/train/";
+
+    //Firebase schemas
+    String SERVING_STATIONS_SCHEMA = "stations_served";
 }

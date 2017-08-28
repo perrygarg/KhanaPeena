@@ -13,6 +13,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.perrygarg.khanapeena.R;
 import com.perrygarg.khanapeena.application.MyApplication;
 
 /**
@@ -101,6 +102,40 @@ public class UIUtil {
 
         //Show toast
         toast.show();
+    }
+
+    public static void makeAlert(Context ctx, String message, String title, String positive) {
+        DialogInterface.OnClickListener onClickListner = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        };
+
+        makeAlert(ctx, message, title, positive, null, onClickListner);
+
+    }
+
+    public static void makeAlert(Context ctx, String message, String title, String positive, DialogInterface.OnClickListener onClickListner) {
+        makeAlert(ctx, message, title, positive, null, onClickListner);
+    }
+
+    public static void makeAlert(Context ctx, String message, String title, String positive, String negative, DialogInterface.OnClickListener onClickListener) {
+        android.support.v7.app.AlertDialog.Builder alertDialogBuilder = new android.support.v7.app.AlertDialog.Builder(ctx, R.style.AppTheme);
+        alertDialogBuilder.setTitle(title);
+        alertDialogBuilder.setMessage(message);
+        alertDialogBuilder.setPositiveButton(positive, onClickListener);
+        if (negative != null) {
+            alertDialogBuilder.setNegativeButton(negative, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+        }
+        android.support.v7.app.AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+
     }
 
     /************* Progress Dialog *************/

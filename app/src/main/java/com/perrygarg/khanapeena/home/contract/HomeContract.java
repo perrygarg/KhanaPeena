@@ -22,6 +22,8 @@ public interface HomeContract {
 
     interface Presenter {
         void fetchAutoCompleteTrainList(String partialTrainInfo);
+
+        void fetchServingStations();
     }
 
 }
