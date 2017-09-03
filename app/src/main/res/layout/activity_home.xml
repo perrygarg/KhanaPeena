@@ -77,20 +77,17 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_left_home"/>
 
-                <android.support.design.widget.TextInputLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+                <EditText
+                    android:id="@+id/date_picker_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:textSize="8dp">
-
-                    <EditText
-                        android:id="@+id/date"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/date"
-                        android:singleLine="true"
-                        android:textSize="14dp" />
-                </android.support.design.widget.TextInputLayout>
+                    android:clickable="true"
+                    android:textSize="14dp"
+                    android:layout_marginTop="@dimen/margin_left_home"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:editable="false"
+                    android:hint="Tap to choose journey date"/>
 
                 <Button
                     android:id="@+id/proceed_button"
@@ -99,7 +96,7 @@
                     android:layout_marginBottom="10dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="@dimen/margin_left_home"
                     android:background="@drawable/selector__button_proceed"
                     android:gravity="center"
                     android:text="@string/proceed"

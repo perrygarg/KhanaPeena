@@ -1,5 +1,6 @@
 package com.perrygarg.khanapeena.home.activity;
 
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatSpinner;
@@ -7,6 +8,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import com.perrygarg.khanapeena.R;
@@ -20,17 +24,26 @@ import com.perrygarg.khanapeena.home.contract.HomeContract;
 import com.perrygarg.khanapeena.home.model.TrainRoute;
 import com.perrygarg.khanapeena.home.presenter.HomePresenter;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 
-public class HomeActivity extends BaseActivity implements HomeContract.View {
+public class HomeActivity extends BaseActivity implements HomeContract.View, View.OnClickListener, AdapterView.OnItemSelectedListener {
     DelayAutocompleteTextView train;
-    AutoCompleteTextView station;
+    Button proceedBtn;
     AppCompatSpinner mealStations;
     HomePresenter homePresenter;
     TrainAutocompleteAdapter adapter;
-    ProgressBar trainProgress, mealStationProgress;
+    ProgressBar trainProgress;
     ProgressDialog dialog;
     ArrayAdapter aa;
+    EditText datePickerText;
+    Calendar myCalendar = Calendar.getInstance();
+
+    private String selectedTrainNumber;
+    private String selectedStationCode;
+    private String selectedDate;
 
     ArrayList<String> availableStationCodes = new ArrayList<>();
 
@@ -55,6 +68,8 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
                 train.setText(train1.trainName);
                 adapter.itemSelected(train1);
 
+                selectedTrainNumber = train1.trainNumber;
+
                 fetchRouteOfSelectedTrain(train1);
             }
         });
@@ -71,14 +86,22 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
         homePresenter.fetchServingStations();
     }
 
+    DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+
+        @Override
+        public void onDateSet(DatePicker view, int year, int monthOfYear,
+                              int dayOfMonth) {
+            myCalendar.set(Calendar.YEAR, year);
+            myCalendar.set(Calendar.MONTH, monthOfYear);
+            myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            updateLabel();
+        }
+
+    };
+
     private void init() {
         findViewsByIds();
-    }
-
-    private void findViewsByIds() {
-        train = (DelayAutocompleteTextView) findViewById(R.id.train);
-        mealStations = (AppCompatSpinner) findViewById(R.id.meal_stations);
-        trainProgress = (ProgressBar) findViewById(R.id.train_progress_bar);
+        setListeners();
 
         availableStationCodes.add(getString(R.string.select_delivery_station));
 
@@ -87,6 +110,20 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //Setting the ArrayAdapter data on the Spinner
         mealStations.setAdapter(aa);
+    }
+
+    private void setListeners() {
+        datePickerText.setOnClickListener(this);
+        mealStations.setOnItemSelectedListener(this);
+        proceedBtn.setOnClickListener(this);
+    }
+
+    private void findViewsByIds() {
+        train = (DelayAutocompleteTextView) findViewById(R.id.train);
+        mealStations = (AppCompatSpinner) findViewById(R.id.meal_stations);
+        trainProgress = (ProgressBar) findViewById(R.id.train_progress_bar);
+        datePickerText = (EditText) findViewById(R.id.date_picker_edit_text);
+        proceedBtn = (Button) findViewById(R.id.proceed_button);
     }
 
     @Override
@@ -150,5 +187,38 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
         }
         availableStationCodes.add(0, getString(R.string.select_delivery_station));
         aa.notifyDataSetChanged();
+    }
+
+    private void updateLabel() {
+        String myFormat = "dd/MM/yyyy"; //In which you need put here
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.ENGLISH);
+
+        datePickerText.setText("Journey Date: " + sdf.format(myCalendar.getTime()));
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.date_picker_edit_text:
+                new DatePickerDialog(this, date, myCalendar
+                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+                break;
+
+            case R.id.proceed_button:
+
+                break;
+        }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+//        Toast.makeText(getApplicationContext(),country[position] ,Toast.LENGTH_LONG).show();
+        //perry
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
     }
 }
