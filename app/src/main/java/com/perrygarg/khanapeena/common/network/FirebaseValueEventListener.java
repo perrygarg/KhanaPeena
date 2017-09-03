@@ -1,5 +1,7 @@
 package com.perrygarg.khanapeena.common.network;
 
+import android.util.Log;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -26,23 +28,17 @@ public class FirebaseValueEventListener implements ValueEventListener {
         switch (serviceCode) {
             case WebConstants.FETCH_SERVING_STATIONS_SERVICE:
                 ArrayList<String> stationCodes = (ArrayList<String>) dataSnapshot.getValue();
-//                HashMap hashMap1 = (HashMap) dataSnapshot.getValue();
-//                if (hashMap1 != null) {
-//                    for (Object entry : hashMap1.entrySet()) {
-//                        HashMap hashMap2 = (HashMap) ((Map.Entry) entry).getValue();
-//                        if (hashMap2.get(AppConstants.RELATION_TYPE).equals(AppConstants.PARENT_OF)) {
-//                            ids.add((String) hashMap2.get(AppConstants.USER2_ID));
-//                        }
-//                    }
-//                }
-//
-//                networkListener.onSuccessFetchingCrIdList(AppConstants.GET_CR_ID_LIST_SERVICE, ids);
+                servingStationsListener.onSuccessFetchServingStations(stationCodes, serviceCode);
                 break;
         }
     }
 
     @Override
     public void onCancelled(DatabaseError databaseError) {
-
+        switch (serviceCode) {
+            case WebConstants.FETCH_SERVING_STATIONS_SERVICE:
+                servingStationsListener.onFailureFetchServingStations(databaseError.getCode(), serviceCode, databaseError.getMessage());
+                break;
+        }
     }
 }

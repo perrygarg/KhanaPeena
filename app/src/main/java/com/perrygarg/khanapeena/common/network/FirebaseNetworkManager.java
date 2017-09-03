@@ -41,6 +41,6 @@ public class FirebaseNetworkManager {
 
     public void fetchServingStations(FirebaseValueEventListener listener) {
         DatabaseReference reference = firebaseHandler.getDatabaseChildReference(WebConstants.SERVING_STATIONS_SCHEMA);
-        reference.addListenerForSingleValueEvent(listener);
+        reference.orderByPriority().addListenerForSingleValueEvent(listener);
     }
 }

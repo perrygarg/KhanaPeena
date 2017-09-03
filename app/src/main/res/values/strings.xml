@@ -12,4 +12,8 @@
     <string name="date">Date</string>
     <string name="proceed">Proceed</string>
     <string name="header_text">Some details please so that we can serve you better!!!</string>
+    <string name="progress_message">Collecting awesome things for you...</string>
+    <string name="progress_title">Hold your breath</string>
+    <string name="available_stations_message">Fetching available stations for selected train...</string>
+    <string name="select_delivery_station">Select delivery station</string>
 </resources>
