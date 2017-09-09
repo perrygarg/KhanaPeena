@@ -7,7 +7,6 @@ import android.support.v7.widget.AppCompatSpinner;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -18,9 +17,9 @@ import com.perrygarg.khanapeena.common.activity.BaseActivity;
 import com.perrygarg.khanapeena.common.network.WebConstants;
 import com.perrygarg.khanapeena.common.util.DelayAutocompleteTextView;
 import com.perrygarg.khanapeena.common.util.UIUtil;
-import com.perrygarg.khanapeena.home.model.Train;
 import com.perrygarg.khanapeena.home.adapter.TrainAutocompleteAdapter;
 import com.perrygarg.khanapeena.home.contract.HomeContract;
+import com.perrygarg.khanapeena.home.model.Train;
 import com.perrygarg.khanapeena.home.model.TrainRoute;
 import com.perrygarg.khanapeena.home.presenter.HomePresenter;
 
