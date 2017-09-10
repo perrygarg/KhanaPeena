@@ -227,8 +227,14 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
 
     private void clickOnProceedButton() {
         if(!selectedTrainNumber.isEmpty() && !selectedStationCode.isEmpty() && !selectedDate.isEmpty()) {
-//perry
+            checkTrainRunAheadViaLiveAPI(selectedTrainNumber, selectedDate);
+
+
         }
+    }
+
+    private void checkTrainRunAheadViaLiveAPI(String selectedTrainNumber, String selectedDate) {
+
     }
 
     @Override
