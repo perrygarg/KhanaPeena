@@ -1,14 +1,13 @@
 package com.perrygarg.khanapeena.home.activity;
 
-import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatSpinner;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
@@ -22,6 +21,7 @@ import com.perrygarg.khanapeena.home.contract.HomeContract;
 import com.perrygarg.khanapeena.home.model.Train;
 import com.perrygarg.khanapeena.home.model.TrainRoute;
 import com.perrygarg.khanapeena.home.presenter.HomePresenter;
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,7 +44,9 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
     private String selectedStationCode;
     private String selectedDate;
 
-    ArrayList<String> availableStationCodes = new ArrayList<>();
+    ArrayList<String> availableStationNames = new ArrayList<>();
+    ArrayList<TrainRoute> intersectionStations = new ArrayList<>();
+    private Calendar[] disabledDates;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,11 +87,10 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
         homePresenter.fetchServingStations();
     }
 
-    DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+    DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
 
         @Override
-        public void onDateSet(DatePicker view, int year, int monthOfYear,
-                              int dayOfMonth) {
+        public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
             myCalendar.set(Calendar.YEAR, year);
             myCalendar.set(Calendar.MONTH, monthOfYear);
             myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
@@ -102,10 +103,10 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
         findViewsByIds();
         setListeners();
 
-        availableStationCodes.add(getString(R.string.select_delivery_station));
+        availableStationNames.add(getString(R.string.select_delivery_station));
 
-        //Creating the ArrayAdapter instance having the availableStationCodes list
-        aa = new ArrayAdapter(this,android.R.layout.simple_spinner_item, availableStationCodes);
+        //Creating the ArrayAdapter instance having the availableStationNames list
+        aa = new ArrayAdapter(this,android.R.layout.simple_spinner_item, availableStationNames);
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //Setting the ArrayAdapter data on the Spinner
         mealStations.setAdapter(aa);
@@ -118,11 +119,11 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
     }
 
     private void findViewsByIds() {
-        train = (DelayAutocompleteTextView) findViewById(R.id.train);
-        mealStations = (AppCompatSpinner) findViewById(R.id.meal_stations);
-        trainProgress = (ProgressBar) findViewById(R.id.train_progress_bar);
-        datePickerText = (EditText) findViewById(R.id.date_picker_edit_text);
-        proceedBtn = (Button) findViewById(R.id.proceed_button);
+        train = findViewById(R.id.train);
+        mealStations = findViewById(R.id.meal_stations);
+        trainProgress = findViewById(R.id.train_progress_bar);
+        datePickerText = findViewById(R.id.date_picker_edit_text);
+        proceedBtn = findViewById(R.id.proceed_button);
     }
 
     @Override
@@ -180,12 +181,18 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
 
     @Override
     public void setIntersectionStations(ArrayList<TrainRoute> intersectionStations) {
-        availableStationCodes.removeAll(availableStationCodes);
+        this.intersectionStations = intersectionStations;
+        availableStationNames.removeAll(availableStationNames);
         for (TrainRoute route : intersectionStations) {
-            availableStationCodes.add(route.stationFullName);
+            availableStationNames.add(route.stationFullName);
         }
-        availableStationCodes.add(0, getString(R.string.select_delivery_station));
+        availableStationNames.add(0, getString(R.string.select_delivery_station));
         aa.notifyDataSetChanged();
+    }
+
+    @Override
+    public void disableDates(Calendar[] disabledDates) {
+        this.disabledDates = disabledDates;
     }
 
     private void updateLabel() {
@@ -193,27 +200,47 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.ENGLISH);
 
         datePickerText.setText("Journey Date: " + sdf.format(myCalendar.getTime()));
+        selectedDate = sdf.format(myCalendar.getTime());
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.date_picker_edit_text:
-                new DatePickerDialog(this, date, myCalendar
-                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+                myCalendar = Calendar.getInstance();
+                DatePickerDialog pickerDialog = DatePickerDialog.newInstance(dateSetListener, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                        myCalendar.get(Calendar.DAY_OF_MONTH));
+                pickerDialog.setVersion(DatePickerDialog.Version.VERSION_1);
+                pickerDialog.show(getFragmentManager(), "JourneyDateSelector");
+                pickerDialog.setMinDate(myCalendar);
+                myCalendar.add(Calendar.MONTH, 1); //adding a month to the calendar
+                pickerDialog.setMaxDate(myCalendar);
+                myCalendar.add(Calendar.MONTH, -1); //subtracting a month from the calendar
+                pickerDialog.setDisabledDays(disabledDates);
                 break;
 
             case R.id.proceed_button:
-
+                clickOnProceedButton();
                 break;
+        }
+    }
+
+    private void clickOnProceedButton() {
+        if(!selectedTrainNumber.isEmpty() && !selectedStationCode.isEmpty() && !selectedDate.isEmpty()) {
+//perry
         }
     }
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-//        Toast.makeText(getApplicationContext(),country[position] ,Toast.LENGTH_LONG).show();
-        //perry
+        if(i != 0) {
+            for(TrainRoute route : intersectionStations) {
+                if(route.stationFullName.equals(availableStationNames.get(i))) {
+                    selectedStationCode = route.stationCode;
+                    break;
+                }
+            }
+        }
     }
 
     @Override

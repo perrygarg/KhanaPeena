@@ -4,6 +4,7 @@ import com.perrygarg.khanapeena.home.model.Train;
 import com.perrygarg.khanapeena.home.model.TrainRoute;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by PerryGarg on 15-08-2017.
@@ -21,6 +22,8 @@ public interface HomeContract {
         void fetchAutoCompleteTrainList(String partialTrainInfo);
 
         void setIntersectionStations(ArrayList<TrainRoute> intersectionStations);
+
+        void disableDates(Calendar[] disabledDates);
     }
 
     interface Presenter {

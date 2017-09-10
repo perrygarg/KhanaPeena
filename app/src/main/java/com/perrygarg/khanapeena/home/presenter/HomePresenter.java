@@ -10,15 +10,19 @@ import com.perrygarg.khanapeena.common.network.WebConstants;
 import com.perrygarg.khanapeena.common.network.WebManager;
 import com.perrygarg.khanapeena.common.network.WebService;
 import com.perrygarg.khanapeena.common.network.WebServiceListener;
+import com.perrygarg.khanapeena.common.util.AppUtil;
 import com.perrygarg.khanapeena.home.contract.HomeContract;
 import com.perrygarg.khanapeena.home.listeners.ServingStationsListener;
+import com.perrygarg.khanapeena.home.model.Day;
 import com.perrygarg.khanapeena.home.model.Train;
 import com.perrygarg.khanapeena.home.model.TrainAutoCompleteResponse;
+import com.perrygarg.khanapeena.home.model.TrainDays;
 import com.perrygarg.khanapeena.home.model.TrainRoute;
 import com.perrygarg.khanapeena.home.model.TrainRouteResponse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 
 /**
  * Created by PerryGarg on 20-08-2017.
@@ -78,11 +82,65 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
 
             case WebConstants.FETCH_TRAIN_ROUTE_SERVICE:
                 TrainRoute[] route = ((TrainRouteResponse)masterResponse).trainRoute;
+                TrainDays trainDays = ((TrainRouteResponse)masterResponse).trainDays;
                 routes = new ArrayList<>(Arrays.asList(route));
+                disableNotRunningDatesInDatePicker(trainDays);
                 calculateIntersectionStations(servingStationCodes, routes);
                 break;
         }
 
+    }
+
+    private void disableNotRunningDatesInDatePicker(TrainDays trainDays) {
+        Day[] days = trainDays.day;
+
+        ArrayList<String> notRunningDays = new ArrayList<>();
+
+        for(Day day : days) {
+            if(day.runs.equals("N")) {
+                notRunningDays.add(day.dayCode);
+            }
+        }
+
+        ArrayList<Calendar> invalidCalendars = new ArrayList<>();
+
+        Calendar fromCalendar = Calendar.getInstance();
+        Calendar toCalendar = Calendar.getInstance();
+        toCalendar.add(Calendar.MONTH, 1);
+        int fromMonth = fromCalendar.get(Calendar.MONTH);
+        int toMonth = toCalendar.get(Calendar.MONTH);
+        for(int i = fromMonth; i <= toMonth; i++) {
+            int totalDays;
+            int startDate = 1;
+            if(i == fromMonth) {
+                Calendar cal = Calendar.getInstance();
+                cal.set(fromCalendar.get(Calendar.YEAR), i, fromCalendar.get(Calendar.DATE));
+                totalDays = cal.getActualMaximum(Calendar.DATE);
+                startDate = cal.get(Calendar.DATE);
+            } else if(i == toMonth) {
+                Calendar cal = Calendar.getInstance();
+                cal.set(toCalendar.get(Calendar.YEAR), i, toCalendar.get(Calendar.DATE));
+                totalDays = cal.get(Calendar.DATE);
+                startDate = 1;
+            } else {
+                Calendar cal = Calendar.getInstance();
+                cal.set(fromCalendar.get(Calendar.YEAR), i, 1);
+                totalDays = cal.getActualMaximum(Calendar.DATE);
+            }
+
+            for (int ii = startDate; ii <= totalDays; ii++) {
+                Calendar tempCal = Calendar.getInstance();
+                tempCal.set(toCalendar.get(Calendar.YEAR), i, ii);
+                if(notRunningDays.contains(AppUtil.getDayOfWeek(tempCal.get(Calendar.DAY_OF_WEEK)))) {
+                    invalidCalendars.add(tempCal);
+                }
+            }
+        }
+
+        Calendar[] disabledDates = new Calendar[invalidCalendars.size()];
+        disabledDates = invalidCalendars.toArray(disabledDates);
+
+        view.disableDates(disabledDates);
     }
 
     private void calculateIntersectionStations(ArrayList<String> servingStationCodes, ArrayList<TrainRoute> routes) {

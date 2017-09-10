@@ -12,4 +12,7 @@ public class TrainRouteResponse extends MasterResponse {
     @SerializedName("route")
     public TrainRoute trainRoute[];
 
+    @SerializedName("train")
+    public TrainDays trainDays;
+
 }
