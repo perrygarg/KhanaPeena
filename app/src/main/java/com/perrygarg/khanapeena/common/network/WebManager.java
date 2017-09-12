@@ -2,6 +2,7 @@ package com.perrygarg.khanapeena.common.network;
 
 import com.perrygarg.khanapeena.application.MyApplication;
 import com.perrygarg.khanapeena.home.service.TrainAutoCompleteService;
+import com.perrygarg.khanapeena.home.service.TrainLiveStatusService;
 import com.perrygarg.khanapeena.home.service.TrainRouteService;
 
 import java.util.HashMap;
@@ -27,6 +28,8 @@ public class WebManager {
                 return new TrainAutoCompleteService(taskCode, serviceListener);
             case WebConstants.FETCH_TRAIN_ROUTE_SERVICE:
                 return new TrainRouteService(taskCode, serviceListener);
+            case WebConstants.CHECK_TRAIN_LIVE_API_SERVICE:
+                return new TrainLiveStatusService(taskCode, serviceListener);
         }
 
         return null;

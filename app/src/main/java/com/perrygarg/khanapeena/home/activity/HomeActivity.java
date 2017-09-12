@@ -138,6 +138,9 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
             case WebConstants.FETCH_TRAIN_ROUTE_SERVICE:
                 dialog = UIUtil.showProgressDialog(this, getString(R.string.progress_title), getString(R.string.available_stations_message), true, false);
                 break;
+            case WebConstants.CHECK_TRAIN_LIVE_API_SERVICE:
+                dialog = UIUtil.showProgressDialog(this, getString(R.string.progress_title), getString(R.string.live_api_check_message), true, false);
+                break;
         }
     }
 
@@ -196,7 +199,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
     }
 
     private void updateLabel() {
-        String myFormat = "dd/MM/yyyy"; //In which you need put here
+        String myFormat = "dd-MM-yyyy"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.ENGLISH);
 
         datePickerText.setText("Journey Date: " + sdf.format(myCalendar.getTime()));
@@ -234,7 +237,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
     }
 
     private void checkTrainRunAheadViaLiveAPI(String selectedTrainNumber, String selectedDate) {
-
+        homePresenter.checkTrainRunAheadViaLiveAPI(selectedTrainNumber, selectedDate);
     }
 
     @Override

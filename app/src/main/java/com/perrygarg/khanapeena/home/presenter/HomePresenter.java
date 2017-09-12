@@ -13,16 +13,23 @@ import com.perrygarg.khanapeena.common.network.WebServiceListener;
 import com.perrygarg.khanapeena.common.util.AppUtil;
 import com.perrygarg.khanapeena.home.contract.HomeContract;
 import com.perrygarg.khanapeena.home.listeners.ServingStationsListener;
+import com.perrygarg.khanapeena.home.model.CurrentStation;
 import com.perrygarg.khanapeena.home.model.Day;
 import com.perrygarg.khanapeena.home.model.Train;
 import com.perrygarg.khanapeena.home.model.TrainAutoCompleteResponse;
 import com.perrygarg.khanapeena.home.model.TrainDays;
+import com.perrygarg.khanapeena.home.model.TrainLiveStatusResponse;
 import com.perrygarg.khanapeena.home.model.TrainRoute;
 import com.perrygarg.khanapeena.home.model.TrainRouteResponse;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by PerryGarg on 20-08-2017.
@@ -59,6 +66,13 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
     }
 
     @Override
+    public void checkTrainRunAheadViaLiveAPI(String selectedTrainNumber, String selectedDate) {
+        view.showProgress(WebConstants.CHECK_TRAIN_LIVE_API_SERVICE);
+        WebService service = WebManager.getService(WebConstants.CHECK_TRAIN_LIVE_API_SERVICE, this);
+        service.getData(selectedTrainNumber, selectedDate);
+    }
+
+    @Override
     public void onServiceBegin(int taskCode) {
 
     }
@@ -87,8 +101,45 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
                 disableNotRunningDatesInDatePicker(trainDays);
                 calculateIntersectionStations(servingStationCodes, routes);
                 break;
+
+            case WebConstants.CHECK_TRAIN_LIVE_API_SERVICE:
+                CurrentStation currentStation = ((TrainLiveStatusResponse)masterResponse).currentStation;
+                if(trainIsAtleast60MinsBehind(currentStation)) {
+
+                }
+                break;
         }
 
+    }
+
+    private boolean trainIsAtleast60MinsBehind(CurrentStation currentStation) {
+        Calendar calendar = Calendar.getInstance();
+
+        String arrivalDate = currentStation.actualArrivalDate;
+        arrivalDate = arrivalDate.replaceAll(" ", "-");
+        String arrivalTime = currentStation.actualArrivalTime;
+        String[] arrivalDateSplit = arrivalDate.split("-");
+        String month = arrivalDateSplit[1];
+        String date = arrivalDateSplit[0];
+        String year = arrivalDateSplit[2];
+        String[] arrTimeSplit = arrivalTime.split(":");
+        String hour = arrTimeSplit[0];
+        String min = arrTimeSplit[1];
+        DateFormat format = new SimpleDateFormat("MMM dd HH:mm:ss yyyy", Locale.US);
+        try {
+            //perry
+            Date formattedArrDate = format.parse(month + " " + date + " " + hour + ":" + min + ":00" + " " + year);
+            Log.d("","");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+//        String todaysDate = calendar.get(Calendar.DATE) + " " + AppUtil.getMonth(calendar.get(Calendar.MONTH)) + " " + calendar.get(Calendar.YEAR);
+//        if(todaysDate.equalsIgnoreCase(currentStation.actualArrivalDate)) {
+//            Date date = calendar.getTime();
+//        }
+        Log.d("", "");
+        return false;
     }
 
     private void disableNotRunningDatesInDatePicker(TrainDays trainDays) {
@@ -158,7 +209,11 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
 
     @Override
     public void onServiceError(String message, int taskCode, int errorType) {
-
+        switch (taskCode) {
+            case WebConstants.CHECK_TRAIN_LIVE_API_SERVICE:
+                //live API didn't work
+                break;
+        }
     }
 
     @Override

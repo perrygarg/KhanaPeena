@@ -15,5 +15,7 @@
     <string name="progress_message">Collecting awesome things for you...</string>
     <string name="progress_title">Hold your breath</string>
     <string name="available_stations_message">Fetching available stations for selected train...</string>
+    <string name="live_api_check_message">Looking for yummy food for you...</string>
     <string name="select_delivery_station">Select delivery station</string>
+    <string name="live_api_error">Live API didn\'t respond.</string>
 </resources>

@@ -32,6 +32,8 @@ public interface HomeContract {
         void fetchRouteOfSelectedTrain(Train train);
 
         void fetchServingStations();
+
+        void checkTrainRunAheadViaLiveAPI(String selectedTrainNumber, String selectedDate);
     }
 
 }
