@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/linlayout"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/footer_height"
+    android:layout_gravity="bottom"
+    android:layout_alignParentBottom="true"
+
+    android:gravity="center_vertical"
+    android:background="@drawable/layout_background"
+    >
+    <ImageView
+        android:id="@+id/checkout_image"
+        android:layout_width="25dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dp"
+        android:layout_centerVertical="true"
+        android:tint="@color/colorPrimary"
+        android:src="@drawable/checkout"
+        android:layout_gravity="right"
+        />
+    <View
+        android:id="@+id/splitline_hor1"
+        android:layout_width="1dp"
+        android:layout_height= "match_parent"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginLeft="12dp"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/checkout_image"
+        android:background="@color/line_color" />
+    <TextView
+        android:id="@+id/totalPrice"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:textSize="14dp"
+        android:layout_toRightOf="@+id/splitline_hor1"
+        android:layout_marginLeft="0dp"
+        android:gravity="center_vertical"
+        android:textColor="@color/colorPrimary"
+        android:text="Rs. 250"/>
+<ImageView
+    android:id="@+id/arrow_checkout"
+    android:layout_width="30dp"
+    android:layout_height="wrap_content"
+    android:src="@drawable/arrow_checkout"
+    android:layout_marginRight="5dp"
+    android:layout_alignParentRight="true"
+    android:tint="@color/colorPrimary"
+    />
+    <TextView
+        android:id="@+id/text_footer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/arrow_checkout"
+        android:layout_centerVertical="true"
+        android:textSize="14dp"
+
+        android:textColor="@color/colorPrimary"
+        android:text="CHECKOUT"/>
+
+</RelativeLayout>

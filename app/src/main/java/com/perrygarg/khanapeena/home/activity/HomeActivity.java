@@ -1,6 +1,7 @@
 package com.perrygarg.khanapeena.home.activity;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatSpinner;
 import android.util.Log;
@@ -16,6 +17,7 @@ import com.perrygarg.khanapeena.common.activity.BaseActivity;
 import com.perrygarg.khanapeena.common.network.WebConstants;
 import com.perrygarg.khanapeena.common.util.DelayAutocompleteTextView;
 import com.perrygarg.khanapeena.common.util.UIUtil;
+import com.perrygarg.khanapeena.foodlisting.activity.FoodListingActivity;
 import com.perrygarg.khanapeena.home.adapter.TrainAutocompleteAdapter;
 import com.perrygarg.khanapeena.home.contract.HomeContract;
 import com.perrygarg.khanapeena.home.model.Train;
@@ -54,6 +56,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
         setContentView(R.layout.activity_home);
 
         setupToolbar(getString(R.string.app_name), false);
+        setToolbarBackgroundColor();
 
         init();
 
@@ -255,6 +258,8 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
 
     private void goToNextScreen() {
         UIUtil.showToast("Next Screen");
+        Intent intent = new Intent(HomeActivity.this, FoodListingActivity.class);
+        startActivity(intent);
     }
 
     private boolean selectedDateLiesInFuture(String selectedDate) {

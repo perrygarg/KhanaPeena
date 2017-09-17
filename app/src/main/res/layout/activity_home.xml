@@ -22,11 +22,12 @@
             android:id="@+id/cardViewFirst"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/margin_left_home"
+            android:layout_marginBottom="20dp"
             android:layout_marginLeft="@dimen/margin_left_home"
             android:layout_marginRight="@dimen/margin_left_home"
-            android:layout_marginTop="@dimen/margin_left_home"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
             card_view:cardCornerRadius="@dimen/margin_left_home"
+            card_view:cardElevation="6dp"
             card_view:contentPadding="15dp">
 
             <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -75,7 +76,7 @@
                     android:id="@+id/meal_stations"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/margin_left_home"/>
+                    android:layout_marginTop="@dimen/activity_vertical_margin" />
 
                 <EditText
                     android:id="@+id/date_picker_edit_text"
@@ -96,7 +97,7 @@
                     android:layout_marginBottom="10dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
-                    android:layout_marginTop="@dimen/margin_left_home"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
                     android:background="@drawable/selector__button_proceed"
                     android:gravity="center"
                     android:text="@string/proceed"
@@ -106,6 +107,28 @@
                      android:id="@+id/proceedLayout"
                      layout="@layout/custom_button" />-->
             </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="OR"/>
+
+        <android.support.v7.widget.CardView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/cardViewSecond"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            card_view:cardCornerRadius="10dp"
+            card_view:cardElevation="6dp"
+            card_view:contentPadding="15dp">
+
         </android.support.v7.widget.CardView>
 
     </LinearLayout>

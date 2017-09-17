@@ -3,4 +3,30 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="primaryColor">#3F51B5</color>
+    <color name="primaryColorDark">#303F9F</color>
+    <color name="accentColor">#FF4081</color>
+    <color name="white">#FFFFFF</color>
+    <color name="white_tabs_unselected">#96ffffff</color>
+    <color name="line_color">#2b000000</color>
+    <color name="dividerColor">#56b6b6b6</color>
+
+    <color name="vlackkk">#7f000000</color>0
+    <color name="textColor">#3F51B5</color>
+    <color name="primaryText">#3F51B5</color>
+    <color name="secondaryText">#3F51B5</color>
+    <color name="transparent">#00ffffff</color>
+    <color name="product_name_black">#bb000000</color>
+    <color name="product_price">#8a000000</color>
+    <color name="backColor">#20727272</color>
+    <color name="white_horiontal_divider_footer">#40ffffff</color>
+    <color name="primaryColor_light">#fff1ff</color>
+    <color name="login_text_color">#5e000000</color>
+
+    <color name="facebook">#3b5998</color>
+    <color name="facebook_pressed">#193676</color>
+    <color name="gplus">#dd4b39</color>
+    <color name="gplus_pressed">#bb2917</color>
+
+    <color name="text_color_personal_details">#bb000000</color>
 </resources>

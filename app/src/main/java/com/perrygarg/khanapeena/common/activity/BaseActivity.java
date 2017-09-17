@@ -6,6 +6,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.perrygarg.khanapeena.R;
+import com.perrygarg.khanapeena.application.MyApplication;
 import com.perrygarg.khanapeena.common.util.AppUtil;
 
 public class BaseActivity extends AppCompatActivity {
@@ -30,6 +31,11 @@ public class BaseActivity extends AppCompatActivity {
     protected Toolbar setupToolbar(String title, boolean setDisplayHomeAsUpEnabled)
     {
         return setupToolbar(title, setDisplayHomeAsUpEnabled, 0);
+    }
+
+    protected void setToolbarBackgroundColor(){
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setBackgroundColor(MyApplication.appContext.getResources().getColor(R.color.colorPrimary));
     }
 
     protected Toolbar setupToolbar(String title, boolean setDisplayHomeAsUpEnabled, int drawableId)

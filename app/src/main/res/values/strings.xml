@@ -6,6 +6,7 @@
     <string name="error_network">Please check your network</string>
     <string name="error_tech">Seems there\'s an error at our end</string>
 
+    <string name="Rs">\u20B9 %1$s</string>
 
     <string name="train_name_or_number">Train Name or Number</string>
     <string name="meal_station">Meal Station</string>
