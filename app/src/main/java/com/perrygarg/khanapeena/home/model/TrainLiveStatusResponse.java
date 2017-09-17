@@ -18,4 +18,7 @@ public class TrainLiveStatusResponse extends MasterResponse {
     @SerializedName("current_station")
     public CurrentStation currentStation;
 
+    @SerializedName("route")
+    public CurrentStation liveRoute[];
+
 }

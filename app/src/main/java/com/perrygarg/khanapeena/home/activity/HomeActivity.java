@@ -151,6 +151,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
                 trainProgress.setVisibility(View.INVISIBLE);
                 break;
             case WebConstants.FETCH_SERVING_STATIONS_SERVICE:
+            case WebConstants.CHECK_TRAIN_LIVE_API_SERVICE:
             case WebConstants.FETCH_TRAIN_ROUTE_SERVICE:
                 dialog.dismiss();
                 break;
@@ -198,6 +199,20 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
         this.disabledDates = disabledDates;
     }
 
+    @Override
+    public void showToastMessage(int taskCode) {
+        UIUtil.showToast("Live API didn't work");
+    }
+
+    @Override
+    public void onSuccessCheckTrainRunAheadViaLiveAPI(boolean shouldProceed) {
+        if(shouldProceed) {
+            goToNextScreen();
+        } else {
+            showError(getString(R.string.order_impossible_error));
+        }
+    }
+
     private void updateLabel() {
         String myFormat = "dd-MM-yyyy"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.ENGLISH);
@@ -230,14 +245,25 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
 
     private void clickOnProceedButton() {
         if(!selectedTrainNumber.isEmpty() && !selectedStationCode.isEmpty() && !selectedDate.isEmpty()) {
-            checkTrainRunAheadViaLiveAPI(selectedTrainNumber, selectedDate);
-
-
+            if(selectedDateLiesInFuture(selectedDate)) {
+                goToNextScreen();
+            } else {
+                checkTrainRunAheadViaLiveAPI(selectedTrainNumber, selectedDate, selectedStationCode);
+            }
         }
     }
 
-    private void checkTrainRunAheadViaLiveAPI(String selectedTrainNumber, String selectedDate) {
-        homePresenter.checkTrainRunAheadViaLiveAPI(selectedTrainNumber, selectedDate);
+    private void goToNextScreen() {
+        UIUtil.showToast("Next Screen");
+    }
+
+    private boolean selectedDateLiesInFuture(String selectedDate) {
+        Calendar calendar = Calendar.getInstance();
+        return myCalendar.after(calendar);
+    }
+
+    private void checkTrainRunAheadViaLiveAPI(String selectedTrainNumber, String selectedDate, String selectedStationCode) {
+        homePresenter.checkTrainRunAheadViaLiveAPI(selectedTrainNumber, selectedDate, selectedStationCode);
     }
 
     @Override

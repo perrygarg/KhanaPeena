@@ -18,4 +18,5 @@
     <string name="live_api_check_message">Looking for yummy food for you...</string>
     <string name="select_delivery_station">Select delivery station</string>
     <string name="live_api_error">Live API didn\'t respond.</string>
+    <string name="order_impossible_error">Sorry, your order couldn\'t be processed. There must be atleast 60 minutes gap between order time and train arrival time.</string>
 </resources>

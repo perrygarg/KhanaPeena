@@ -39,6 +39,7 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
     HomeContract.View view;
     private ArrayList<String> servingStationCodes;
     private ArrayList<TrainRoute> routes;
+    private String selectedStationCode;
 
     public HomePresenter(HomeContract.View view) {
         this.view = view;
@@ -66,7 +67,8 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
     }
 
     @Override
-    public void checkTrainRunAheadViaLiveAPI(String selectedTrainNumber, String selectedDate) {
+    public void checkTrainRunAheadViaLiveAPI(String selectedTrainNumber, String selectedDate, String selectedStationCode) {
+        this.selectedStationCode = selectedStationCode;
         view.showProgress(WebConstants.CHECK_TRAIN_LIVE_API_SERVICE);
         WebService service = WebManager.getService(WebConstants.CHECK_TRAIN_LIVE_API_SERVICE, this);
         service.getData(selectedTrainNumber, selectedDate);
@@ -103,9 +105,20 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
                 break;
 
             case WebConstants.CHECK_TRAIN_LIVE_API_SERVICE:
-                CurrentStation currentStation = ((TrainLiveStatusResponse)masterResponse).currentStation;
-                if(trainIsAtleast60MinsBehind(currentStation)) {
-
+                CurrentStation actStation = null;
+                CurrentStation currentStation[] = ((TrainLiveStatusResponse)masterResponse).liveRoute;
+                for (CurrentStation cStation : currentStation) {
+                    if(cStation.station.stationCode.equalsIgnoreCase(this.selectedStationCode)) {
+                        actStation = cStation;
+                        break;
+                    }
+                }
+                if(trainIsAtleast60MinsBehind(actStation)) {
+                    view.hideProgress(taskCode);
+                    view.onSuccessCheckTrainRunAheadViaLiveAPI(true);
+                } else {
+                    view.hideProgress(taskCode);
+                    view.onSuccessCheckTrainRunAheadViaLiveAPI(false);
                 }
                 break;
         }
@@ -113,32 +126,48 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
     }
 
     private boolean trainIsAtleast60MinsBehind(CurrentStation currentStation) {
-        Calendar calendar = Calendar.getInstance();
+        if(currentStation != null) {
+            Calendar calendar = Calendar.getInstance();
+            Date formattedArrDate = null;
 
-        String arrivalDate = currentStation.actualArrivalDate;
-        arrivalDate = arrivalDate.replaceAll(" ", "-");
-        String arrivalTime = currentStation.actualArrivalTime;
-        String[] arrivalDateSplit = arrivalDate.split("-");
-        String month = arrivalDateSplit[1];
-        String date = arrivalDateSplit[0];
-        String year = arrivalDateSplit[2];
-        String[] arrTimeSplit = arrivalTime.split(":");
-        String hour = arrTimeSplit[0];
-        String min = arrTimeSplit[1];
-        DateFormat format = new SimpleDateFormat("MMM dd HH:mm:ss yyyy", Locale.US);
-        try {
-            //perry
-            Date formattedArrDate = format.parse(month + " " + date + " " + hour + ":" + min + ":00" + " " + year);
-            Log.d("","");
-        } catch (ParseException e) {
-            e.printStackTrace();
+            String arrivalDate = currentStation.actualArrivalDate;
+            arrivalDate = arrivalDate.replaceAll(" ", "-");
+            String arrivalTime = currentStation.actualArrivalTime;
+            String[] arrivalDateSplit = arrivalDate.split("-");
+            String month = arrivalDateSplit[1];
+            String date = arrivalDateSplit[0];
+            String year = arrivalDateSplit[2];
+            String[] arrTimeSplit = arrivalTime.split(":");
+            String hour = arrTimeSplit[0];
+            String min = arrTimeSplit[1];
+            DateFormat format = new SimpleDateFormat("MMM dd HH:mm:ss yyyy", Locale.US);
+            try {
+                //perry
+                formattedArrDate = format.parse(month + " " + date + " " + hour + ":" + min + ":00" + " " + year);
+                Log.d("", "");
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            Date formattedCurrDate = calendar.getTime();
+
+            if(formattedCurrDate.before(formattedArrDate)) {
+                return true;
+            } else {
+                long difference = formattedArrDate.getTime() - formattedCurrDate.getTime();
+                if(Math.signum(difference) >= 1.0f) {
+                    long differenceMin = difference/1000/60;
+                    if(difference >= 60) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+
         }
-
-//        String todaysDate = calendar.get(Calendar.DATE) + " " + AppUtil.getMonth(calendar.get(Calendar.MONTH)) + " " + calendar.get(Calendar.YEAR);
-//        if(todaysDate.equalsIgnoreCase(currentStation.actualArrivalDate)) {
-//            Date date = calendar.getTime();
-//        }
-        Log.d("", "");
         return false;
     }
 
@@ -212,6 +241,9 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
         switch (taskCode) {
             case WebConstants.CHECK_TRAIN_LIVE_API_SERVICE:
                 //live API didn't work
+                view.hideProgress(taskCode);
+                view.showToastMessage(taskCode);
+                view.onSuccessCheckTrainRunAheadViaLiveAPI(true);
                 break;
         }
     }

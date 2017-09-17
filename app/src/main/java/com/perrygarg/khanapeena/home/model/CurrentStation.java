@@ -29,4 +29,7 @@ public class CurrentStation {
     @SerializedName("actarr_date")
     public String actualArrivalDate;
 
+    @SerializedName("station")
+    public Station station;
+
 }
