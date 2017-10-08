@@ -13,6 +13,7 @@ public interface WebConstants {
     int FETCH_SERVING_STATIONS_SERVICE = 2;
     int FETCH_TRAIN_ROUTE_SERVICE = 3;
     int CHECK_TRAIN_LIVE_API_SERVICE = 4;
+    int FETCH_TRAIN_LIST_SERVICE = 5;
 
     String RAIL_API_KEY = "/apikey/m4h2fi5539";
     String VERSION = "v2/";
@@ -32,6 +33,6 @@ public interface WebConstants {
 
     //Firebase schemas
     String SERVING_STATIONS_SCHEMA = "stations_served";
-
+    String TRAIN_LIST_SCHEMA = "train_list";
 
 }

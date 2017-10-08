@@ -490,6 +490,34 @@ public class AppUtil {
         }
     }
 
+    public static String getDayOfWeekModified(int value) {
+        String day = "";
+        switch (value) {
+            case 1:
+                day = "SUN";
+                break;
+            case 2:
+                day = "MON";
+                break;
+            case 3:
+                day = "TUE";
+                break;
+            case 4:
+                day = "WED";
+                break;
+            case 5:
+                day = "THU";
+                break;
+            case 6:
+                day = "FRI";
+                break;
+            case 0:
+                day = "SAT";
+                break;
+        }
+        return day;
+    }
+
     public static String getDayOfWeek(int value) {
         String day = "";
         switch (value) {
@@ -513,6 +541,34 @@ public class AppUtil {
                 break;
             case 7:
                 day = "SAT";
+                break;
+        }
+        return day;
+    }
+
+    public static int getWeekDayOfWeek(String value) {
+        int day = -1;
+        switch (value) {
+            case "SUN":
+                day = 1;
+                break;
+            case "MON":
+                day = 2;
+                break;
+            case "TUE":
+                day = 3;
+                break;
+            case "WED":
+                day = 4;
+                break;
+            case "THU":
+                day = 5;
+                break;
+            case "FRI":
+                day = 6;
+                break;
+            case "SAT":
+                day = 7;
                 break;
         }
         return day;
@@ -588,4 +644,7 @@ public class AppUtil {
         return false;
     }
 
+    public static int shiftDesiredDays(int d, int dayOfReachingStation) {
+        return (dayOfReachingStation + d) % 7;
+    }
 }

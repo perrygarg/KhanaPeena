@@ -27,6 +27,7 @@ public class TrainAutocompleteAdapter extends BaseAdapter implements Filterable 
     private Context mContext;
     private HomeContract.View view;
     private List<Train> resultList = new ArrayList();
+    private List<Train> filteredList = new ArrayList();
     private Train trainSelected;
 
     public TrainAutocompleteAdapter(Context context, HomeContract.View view) {
@@ -40,12 +41,12 @@ public class TrainAutocompleteAdapter extends BaseAdapter implements Filterable 
 
     @Override
     public int getCount() {
-        return resultList.size();
+        return filteredList.size();
     }
 
     @Override
     public Train getItem(int i) {
-        return resultList.get(i);
+        return filteredList.get(i);
     }
 
     @Override
@@ -60,8 +61,8 @@ public class TrainAutocompleteAdapter extends BaseAdapter implements Filterable 
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.autocomplete_train_list_row, viewGroup, false);
         }
-        ((TextView) view.findViewById(R.id.text1)).setText(getItem(i).trainName);
-        ((TextView) view.findViewById(R.id.text2)).setText(getItem(i).trainNumber);
+        ((TextView) view.findViewById(R.id.text1)).setText(getItem(i).name);
+        ((TextView) view.findViewById(R.id.text2)).setText(getItem(i).number);
         return view;
     }
 
@@ -73,26 +74,17 @@ public class TrainAutocompleteAdapter extends BaseAdapter implements Filterable 
                 FilterResults filterResults = new FilterResults();
                 if (constraint != null && !constraint.toString().isEmpty()) {
 
-                    if(trainSelected != null) {
-                        if(!trainSelected.trainName.equals(constraint.toString())) {
-                            trainSelected = null;
-                            view.fetchAutoCompleteTrainList(constraint.toString());
+                    ArrayList<Train> filteredTrains = new ArrayList<>();
+
+                    for (Train train : resultList) {
+                        if(String.valueOf(train.number).contains(constraint) || train.name.contains(constraint.toString().toUpperCase())) {
+                            filteredTrains.add(train);
                         }
-                    } else {
-                        view.fetchAutoCompleteTrainList(constraint.toString());
                     }
 
-//                    if(resultList.size() > 0) {
-//                        for (Train train : resultList) {
-//                            if(!train.trainNumber.startsWith(constraint.toString())) {
-//                                resultList.remove(train);
-//                            }
-//                        }
-//                    }
-
                     // Assign the data to the FilterResults
-                    filterResults.values = resultList;
-                    filterResults.count = resultList.size();
+                    filterResults.values = filteredTrains;
+                    filterResults.count = filteredTrains.size();
                 }
                 return filterResults;
             }
@@ -100,7 +92,7 @@ public class TrainAutocompleteAdapter extends BaseAdapter implements Filterable 
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
                 if (results != null && results.count > 0) {
-                    resultList = (List<Train>) results.values;
+                    filteredList = (List<Train>) results.values;
                     notifyDataSetChanged();
                 } else {
                     notifyDataSetInvalidated();

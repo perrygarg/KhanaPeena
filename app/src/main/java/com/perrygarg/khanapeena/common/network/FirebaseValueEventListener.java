@@ -6,6 +6,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.perrygarg.khanapeena.home.listeners.ServingStationsListener;
+import com.perrygarg.khanapeena.home.model.Train;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +31,19 @@ public class FirebaseValueEventListener implements ValueEventListener {
                 ArrayList<String> stationCodes = (ArrayList<String>) dataSnapshot.getValue();
                 servingStationsListener.onSuccessFetchServingStations(stationCodes, serviceCode);
                 break;
+            case WebConstants.FETCH_TRAIN_LIST_SERVICE:
+                ArrayList<HashMap> list = (ArrayList<HashMap>) dataSnapshot.getValue();
+                ArrayList<Train> trainList = new ArrayList<>();
+                for (HashMap map : list) {
+                    Train train = new Train();
+                    train.name = (String) map.get("name");
+                    train.number = Long.toString((Long) map.get("number"));
+                    train.sourcestn = (String) map.get("sourcestn");
+                    train.destinationstn = (String) map.get("destinationstn");
+                    trainList.add(train);
+                }
+                servingStationsListener.onSuccessFetchTrainList(trainList, serviceCode);
+                break;
         }
     }
 
@@ -38,6 +52,9 @@ public class FirebaseValueEventListener implements ValueEventListener {
         switch (serviceCode) {
             case WebConstants.FETCH_SERVING_STATIONS_SERVICE:
                 servingStationsListener.onFailureFetchServingStations(databaseError.getCode(), serviceCode, databaseError.getMessage());
+                break;
+            case WebConstants.FETCH_TRAIN_LIST_SERVICE:
+                servingStationsListener.onFailureFetchTrainList(databaseError.getCode(), serviceCode, databaseError.getMessage());
                 break;
         }
     }

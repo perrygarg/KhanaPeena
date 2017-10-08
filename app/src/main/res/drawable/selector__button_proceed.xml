@@ -15,5 +15,12 @@
             <corners android:radius="8dp" />
         </shape>
     </item>
+    <item android:state_enabled="false">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/colorPrimaryDisabled" />
+            <stroke android:width="0.5dp"  />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
 
 </selector>

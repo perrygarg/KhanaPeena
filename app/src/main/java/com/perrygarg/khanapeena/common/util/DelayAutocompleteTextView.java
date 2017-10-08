@@ -42,8 +42,9 @@ public class DelayAutocompleteTextView extends AutoCompleteTextView {
 //        if (mLoadingIndicator != null) {
 //            mLoadingIndicator.setVisibility(View.VISIBLE);
 //        }
-        mHandler.removeMessages(MESSAGE_TEXT_CHANGED);
-        mHandler.sendMessageDelayed(mHandler.obtainMessage(MESSAGE_TEXT_CHANGED, text), mAutoCompleteDelay);
+//        mHandler.removeMessages(MESSAGE_TEXT_CHANGED);
+//        mHandler.sendMessageDelayed(mHandler.obtainMessage(MESSAGE_TEXT_CHANGED, text), mAutoCompleteDelay);
+        super.performFiltering(text, keyCode);
     }
 
     @Override

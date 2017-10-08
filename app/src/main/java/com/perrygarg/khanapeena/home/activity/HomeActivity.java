@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatSpinner;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -49,6 +48,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
     ArrayList<String> availableStationNames = new ArrayList<>();
     ArrayList<TrainRoute> intersectionStations = new ArrayList<>();
     private Calendar[] disabledDates;
+    private boolean highlightToday = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,17 +62,17 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
 
         homePresenter = new HomePresenter(this);
 
-        train.setThreshold(3);
+        train.setThreshold(2);
         adapter = new TrainAutocompleteAdapter(this, this);
         train.setAdapter(adapter);
         train.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Train train1 = (Train) adapterView.getItemAtPosition(position);
-                train.setText(train1.trainName);
+                train.setText(train1.name);
                 adapter.itemSelected(train1);
 
-                selectedTrainNumber = train1.trainNumber;
+                selectedTrainNumber = train1.number;
 
                 fetchRouteOfSelectedTrain(train1);
             }
@@ -80,6 +80,12 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
 
 
         fetchServingStationsFromFirebase();
+
+        fetchTrainListFromFirebase();
+    }
+
+    private void fetchTrainListFromFirebase() {
+        homePresenter.fetchTrainList();
     }
 
     private void fetchRouteOfSelectedTrain(Train train1) {
@@ -98,6 +104,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
             myCalendar.set(Calendar.MONTH, monthOfYear);
             myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
             updateLabel();
+            proceedBtn.setEnabled(true);
         }
 
     };
@@ -127,6 +134,10 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
         trainProgress = findViewById(R.id.train_progress_bar);
         datePickerText = findViewById(R.id.date_picker_edit_text);
         proceedBtn = findViewById(R.id.proceed_button);
+
+        mealStations.setEnabled(false);
+        datePickerText.setEnabled(false);
+        proceedBtn.setEnabled(false);
     }
 
     @Override
@@ -135,8 +146,15 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
             case WebConstants.WS_CODE_TRAIN_AUTOCOMPLETE:
                 trainProgress.setVisibility(View.VISIBLE);
                 break;
+            case WebConstants.FETCH_TRAIN_LIST_SERVICE:
             case WebConstants.FETCH_SERVING_STATIONS_SERVICE:
-                dialog = UIUtil.showProgressDialog(this, getString(R.string.progress_title), getString(R.string.progress_message), true, false);
+                if(dialog == null) {
+                    dialog = UIUtil.showProgressDialog(this, getString(R.string.progress_title), getString(R.string.progress_message), true, false);
+                } else {
+                    if(!dialog.isShowing()) {
+                        dialog = UIUtil.showProgressDialog(this, getString(R.string.progress_title), getString(R.string.progress_message), true, false);
+                    }
+                }
                 break;
             case WebConstants.FETCH_TRAIN_ROUTE_SERVICE:
                 dialog = UIUtil.showProgressDialog(this, getString(R.string.progress_title), getString(R.string.available_stations_message), true, false);
@@ -154,9 +172,12 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
                 trainProgress.setVisibility(View.INVISIBLE);
                 break;
             case WebConstants.FETCH_SERVING_STATIONS_SERVICE:
+            case WebConstants.FETCH_TRAIN_LIST_SERVICE:
             case WebConstants.CHECK_TRAIN_LIVE_API_SERVICE:
             case WebConstants.FETCH_TRAIN_ROUTE_SERVICE:
-                dialog.dismiss();
+                if(dialog.isShowing()) {
+                    dialog.dismiss();
+                }
                 break;
         }
     }
@@ -188,6 +209,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
 
     @Override
     public void setIntersectionStations(ArrayList<TrainRoute> intersectionStations) {
+        mealStations.setEnabled(true);
         this.intersectionStations = intersectionStations;
         availableStationNames.removeAll(availableStationNames);
         for (TrainRoute route : intersectionStations) {
@@ -198,8 +220,11 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
     }
 
     @Override
-    public void disableDates(Calendar[] disabledDates) {
+    public void disableDates(Calendar[] disabledDates, boolean highlightToday) {
         this.disabledDates = disabledDates;
+        if(highlightToday) {
+            this.highlightToday = highlightToday;
+        }
     }
 
     @Override
@@ -214,6 +239,11 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
         } else {
             showError(getString(R.string.order_impossible_error));
         }
+    }
+
+    @Override
+    public void onSuccessFetchTrainList(ArrayList<Train> trainList) {
+        adapter.setTrainsListInstance(trainList);
     }
 
     private void updateLabel() {
@@ -238,6 +268,12 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
                 pickerDialog.setMaxDate(myCalendar);
                 myCalendar.add(Calendar.MONTH, -1); //subtracting a month from the calendar
                 pickerDialog.setDisabledDays(disabledDates);
+                if(highlightToday) {
+                    Calendar[] calendars = new Calendar[1];
+                    Calendar calendar = Calendar.getInstance();
+                    calendars[0] = calendar;
+                    pickerDialog.setHighlightedDays(calendars);
+                }
                 break;
 
             case R.id.proceed_button:
@@ -247,6 +283,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
     }
 
     private void clickOnProceedButton() {
+        //perry left here
         if(!selectedTrainNumber.isEmpty() && !selectedStationCode.isEmpty() && !selectedDate.isEmpty()) {
             if(selectedDateLiesInFuture(selectedDate)) {
                 goToNextScreen();
@@ -277,6 +314,8 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
             for(TrainRoute route : intersectionStations) {
                 if(route.stationFullName.equals(availableStationNames.get(i))) {
                     selectedStationCode = route.stationCode;
+                    homePresenter.manipulateDatesInDatePicker(selectedStationCode);
+                    datePickerText.setEnabled(true);
                     break;
                 }
             }

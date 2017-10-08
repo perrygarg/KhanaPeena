@@ -43,4 +43,9 @@ public class FirebaseNetworkManager {
         DatabaseReference reference = firebaseHandler.getDatabaseChildReference(WebConstants.SERVING_STATIONS_SCHEMA);
         reference.orderByPriority().addListenerForSingleValueEvent(listener);
     }
+
+    public void fetchTrainList(FirebaseValueEventListener listener) {
+        DatabaseReference reference = firebaseHandler.getDatabaseChildReference(WebConstants.TRAIN_LIST_SCHEMA);
+        reference.orderByKey().addListenerForSingleValueEvent(listener);
+    }
 }

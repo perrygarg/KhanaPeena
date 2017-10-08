@@ -26,7 +26,7 @@ public class TrainRouteService extends WebService {
         Train train = (Train) args[0];
 
         AppHttpClient httpClient = new AppHttpClient(MyApplication.appContext);
-        httpClient.sendGSONRequest(Request.Method.GET, WebConstants.URL_TRAIN_ROUTE + train.trainNumber + WebConstants.RAIL_API_KEY, null, TrainRouteResponse.class, WebManager.getHeaders(), this, this, tag);
+        httpClient.sendGSONRequest(Request.Method.GET, WebConstants.URL_TRAIN_ROUTE + train.number + WebConstants.RAIL_API_KEY, null, TrainRouteResponse.class, WebManager.getHeaders(), this, this, tag);
     }
 
     @Override

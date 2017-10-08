@@ -23,11 +23,13 @@ public interface HomeContract {
 
         void setIntersectionStations(ArrayList<TrainRoute> intersectionStations);
 
-        void disableDates(Calendar[] disabledDates);
+        void disableDates(Calendar[] disabledDates, boolean highlightToday);
 
         void showToastMessage(int taskCode);
 
         void onSuccessCheckTrainRunAheadViaLiveAPI(boolean shouldProceed);
+
+        void onSuccessFetchTrainList(ArrayList<Train> trainList);
     }
 
     interface Presenter {
@@ -38,6 +40,8 @@ public interface HomeContract {
         void fetchServingStations();
 
         void checkTrainRunAheadViaLiveAPI(String selectedTrainNumber, String selectedDate, String selectedStationCode);
+
+        void fetchTrainList();
     }
 
 }

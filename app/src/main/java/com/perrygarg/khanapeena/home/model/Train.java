@@ -8,10 +8,9 @@ import com.google.gson.annotations.SerializedName;
 
 public class Train {
 
-    @SerializedName("number")
-    public String trainNumber;
-
-    @SerializedName("name")
-    public String trainName;
+    public String name;
+    public String number;
+    public String sourcestn;
+    public String destinationstn;
 
 }

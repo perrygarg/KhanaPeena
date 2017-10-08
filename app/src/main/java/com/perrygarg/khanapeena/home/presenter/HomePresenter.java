@@ -11,6 +11,7 @@ import com.perrygarg.khanapeena.common.network.WebManager;
 import com.perrygarg.khanapeena.common.network.WebService;
 import com.perrygarg.khanapeena.common.network.WebServiceListener;
 import com.perrygarg.khanapeena.common.util.AppUtil;
+import com.perrygarg.khanapeena.common.util.UIUtil;
 import com.perrygarg.khanapeena.home.contract.HomeContract;
 import com.perrygarg.khanapeena.home.listeners.ServingStationsListener;
 import com.perrygarg.khanapeena.home.model.CurrentStation;
@@ -40,6 +41,7 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
     private ArrayList<String> servingStationCodes;
     private ArrayList<TrainRoute> routes;
     private String selectedStationCode;
+    private TrainDays trainDays;
 
     public HomePresenter(HomeContract.View view) {
         this.view = view;
@@ -61,7 +63,7 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
 
     @Override
     public void fetchServingStations() {
-        view.showProgress(WebConstants.FETCH_SERVING_STATIONS_SERVICE);
+//        view.showProgress(WebConstants.FETCH_SERVING_STATIONS_SERVICE);
         FirebaseValueEventListener listener = new FirebaseValueEventListener(this, WebConstants.FETCH_SERVING_STATIONS_SERVICE);
         FirebaseNetworkManager.getInstance().fetchServingStations(listener);
     }
@@ -72,6 +74,13 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
         view.showProgress(WebConstants.CHECK_TRAIN_LIVE_API_SERVICE);
         WebService service = WebManager.getService(WebConstants.CHECK_TRAIN_LIVE_API_SERVICE, this);
         service.getData(selectedTrainNumber, selectedDate);
+    }
+
+    @Override
+    public void fetchTrainList() {
+        view.showProgress(WebConstants.FETCH_TRAIN_LIST_SERVICE);
+        FirebaseValueEventListener listener = new FirebaseValueEventListener(this, WebConstants.FETCH_TRAIN_LIST_SERVICE);
+        FirebaseNetworkManager.getInstance().fetchTrainList(listener);
     }
 
     @Override
@@ -98,9 +107,9 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
 
             case WebConstants.FETCH_TRAIN_ROUTE_SERVICE:
                 TrainRoute[] route = ((TrainRouteResponse)masterResponse).trainRoute;
-                TrainDays trainDays = ((TrainRouteResponse)masterResponse).trainDays;
+                trainDays = ((TrainRouteResponse)masterResponse).trainDays;
                 routes = new ArrayList<>(Arrays.asList(route));
-                disableNotRunningDatesInDatePicker(trainDays);
+//                manipulateDatesInDatePicker(trainDays, routes);
                 calculateIntersectionStations(servingStationCodes, routes);
                 break;
 
@@ -171,14 +180,28 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
         return false;
     }
 
-    private void disableNotRunningDatesInDatePicker(TrainDays trainDays) {
+    public void manipulateDatesInDatePicker(String selectedStationCode) {
         Day[] days = trainDays.day;
 
         ArrayList<String> notRunningDays = new ArrayList<>();
 
+        int dayOfReachingStation = -1;
+
+        for (TrainRoute route : routes) {
+            if(route.stationCode.equalsIgnoreCase(selectedStationCode.trim())) {
+                dayOfReachingStation = route.day;
+            }
+        }
+
+        days[4].runs = "N";
+
         for(Day day : days) {
             if(day.runs.equals("N")) {
-                notRunningDays.add(day.dayCode);
+                UIUtil.showToast(day.dayCode);
+                int d = AppUtil.getWeekDayOfWeek(day.dayCode);
+                int finalDay = AppUtil.shiftDesiredDays(d, dayOfReachingStation - 1);
+                notRunningDays.add(AppUtil.getDayOfWeekModified(finalDay));
+                UIUtil.showToast(AppUtil.getDayOfWeekModified(finalDay));
             }
         }
 
@@ -186,7 +209,10 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
 
         Calendar fromCalendar = Calendar.getInstance();
         Calendar toCalendar = Calendar.getInstance();
-        toCalendar.add(Calendar.MONTH, 1);
+        toCalendar.add(Calendar.DATE, 30);
+
+        boolean highlightToday = false;
+
         int fromMonth = fromCalendar.get(Calendar.MONTH);
         int toMonth = toCalendar.get(Calendar.MONTH);
         for(int i = fromMonth; i <= toMonth; i++) {
@@ -212,7 +238,11 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
                 Calendar tempCal = Calendar.getInstance();
                 tempCal.set(toCalendar.get(Calendar.YEAR), i, ii);
                 if(notRunningDays.contains(AppUtil.getDayOfWeek(tempCal.get(Calendar.DAY_OF_WEEK)))) {
-                    invalidCalendars.add(tempCal);
+                    if(ii == (int)fromCalendar.get(Calendar.DATE) && i == fromCalendar.get(Calendar.MONTH)) {
+                        highlightToday = true;
+                    } else {
+                        invalidCalendars.add(tempCal);
+                    }
                 }
             }
         }
@@ -220,7 +250,7 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
         Calendar[] disabledDates = new Calendar[invalidCalendars.size()];
         disabledDates = invalidCalendars.toArray(disabledDates);
 
-        view.disableDates(disabledDates);
+        view.disableDates(disabledDates, highlightToday);
     }
 
     private void calculateIntersectionStations(ArrayList<String> servingStationCodes, ArrayList<TrainRoute> routes) {
@@ -255,12 +285,23 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
 
     @Override
     public void onSuccessFetchServingStations(ArrayList<String> stationCodes, int serviceCode) {
-        view.hideProgress(serviceCode);
+//        view.hideProgress(serviceCode);
         this.servingStationCodes = stationCodes;
     }
 
     @Override
     public void onFailureFetchServingStations(int errCode, int serviceCode, String errMsg) {
+
+    }
+
+    @Override
+    public void onSuccessFetchTrainList(ArrayList<Train> trainList, int serviceCode) {
+        view.hideProgress(serviceCode);
+        view.onSuccessFetchTrainList(trainList);
+    }
+
+    @Override
+    public void onFailureFetchTrainList(int code, int serviceCode, String message) {
 
     }
 }

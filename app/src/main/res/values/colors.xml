@@ -2,6 +2,7 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimaryDisabled">#90303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="primaryColor">#3F51B5</color>
     <color name="primaryColorDark">#303F9F</color>
@@ -10,6 +11,8 @@
     <color name="white_tabs_unselected">#96ffffff</color>
     <color name="line_color">#2b000000</color>
     <color name="dividerColor">#56b6b6b6</color>
+
+    <color name="mdtp_date_picker_text_highlighted">#303F9F</color>
 
     <color name="vlackkk">#7f000000</color>0
     <color name="textColor">#3F51B5</color>

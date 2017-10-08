@@ -14,6 +14,9 @@ public class TrainRoute {
     @SerializedName("lng")
     public float lang;
 
+    @SerializedName("day")
+    public int day;
+
     @SerializedName("code")
     public String stationCode;
 
