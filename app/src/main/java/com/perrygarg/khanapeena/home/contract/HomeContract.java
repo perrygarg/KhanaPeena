@@ -37,7 +37,7 @@ public interface HomeContract {
 
         void fetchRouteOfSelectedTrain(Train train);
 
-        void fetchServingStations();
+        void fetchConfigFromFirebase();
 
         void checkTrainRunAheadViaLiveAPI(String selectedTrainNumber, String selectedDate, String selectedStationCode);
 

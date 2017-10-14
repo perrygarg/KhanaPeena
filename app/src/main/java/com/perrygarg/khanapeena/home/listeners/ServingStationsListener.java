@@ -1,5 +1,6 @@
 package com.perrygarg.khanapeena.home.listeners;
 
+import com.perrygarg.khanapeena.home.model.AppConfig;
 import com.perrygarg.khanapeena.home.model.Train;
 
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 
 public interface ServingStationsListener {
 
-    void onSuccessFetchServingStations(ArrayList<String> stationCodes, int serviceCode);
+    void onSuccessFetchConfig(AppConfig stationCodes, int serviceCode);
     void onFailureFetchServingStations(int errCode, int serviceCode, String errMsg);
 
     void onSuccessFetchTrainList(ArrayList<Train> trainList, int serviceCode);

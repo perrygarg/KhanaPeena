@@ -14,6 +14,7 @@ import com.perrygarg.khanapeena.common.util.AppUtil;
 import com.perrygarg.khanapeena.common.util.UIUtil;
 import com.perrygarg.khanapeena.home.contract.HomeContract;
 import com.perrygarg.khanapeena.home.listeners.ServingStationsListener;
+import com.perrygarg.khanapeena.home.model.AppConfig;
 import com.perrygarg.khanapeena.home.model.CurrentStation;
 import com.perrygarg.khanapeena.home.model.Day;
 import com.perrygarg.khanapeena.home.model.Train;
@@ -38,7 +39,7 @@ import java.util.Locale;
 
 public class HomePresenter implements HomeContract.Presenter, WebServiceListener, ServingStationsListener {
     HomeContract.View view;
-    private ArrayList<String> servingStationCodes;
+    private AppConfig config;
     private ArrayList<TrainRoute> routes;
     private String selectedStationCode;
     private TrainDays trainDays;
@@ -62,9 +63,9 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
     }
 
     @Override
-    public void fetchServingStations() {
+    public void fetchConfigFromFirebase() {
 //        view.showProgress(WebConstants.FETCH_SERVING_STATIONS_SERVICE);
-        FirebaseValueEventListener listener = new FirebaseValueEventListener(this, WebConstants.FETCH_SERVING_STATIONS_SERVICE);
+        FirebaseValueEventListener listener = new FirebaseValueEventListener(this, WebConstants.FETCH_CONFIG_SERVICE);
         FirebaseNetworkManager.getInstance().fetchServingStations(listener);
     }
 
@@ -110,7 +111,7 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
                 trainDays = ((TrainRouteResponse)masterResponse).trainDays;
                 routes = new ArrayList<>(Arrays.asList(route));
 //                manipulateDatesInDatePicker(trainDays, routes);
-                calculateIntersectionStations(servingStationCodes, routes);
+                calculateIntersectionStations(config.stations_served, routes);
                 break;
 
             case WebConstants.CHECK_TRAIN_LIVE_API_SERVICE:
@@ -284,9 +285,9 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
     }
 
     @Override
-    public void onSuccessFetchServingStations(ArrayList<String> stationCodes, int serviceCode) {
+    public void onSuccessFetchConfig(AppConfig config, int serviceCode) {
 //        view.hideProgress(serviceCode);
-        this.servingStationCodes = stationCodes;
+        this.config = config;
     }
 
     @Override

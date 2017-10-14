@@ -1,11 +1,10 @@
 package com.perrygarg.khanapeena.common.network;
 
-import android.util.Log;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.perrygarg.khanapeena.home.listeners.ServingStationsListener;
+import com.perrygarg.khanapeena.home.model.AppConfig;
 import com.perrygarg.khanapeena.home.model.Train;
 
 import java.util.ArrayList;
@@ -27,9 +26,9 @@ public class FirebaseValueEventListener implements ValueEventListener {
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
         switch (serviceCode) {
-            case WebConstants.FETCH_SERVING_STATIONS_SERVICE:
-                ArrayList<String> stationCodes = (ArrayList<String>) dataSnapshot.getValue();
-                servingStationsListener.onSuccessFetchServingStations(stationCodes, serviceCode);
+            case WebConstants.FETCH_CONFIG_SERVICE:
+                AppConfig config = dataSnapshot.getValue(AppConfig.class);
+                servingStationsListener.onSuccessFetchConfig(config, serviceCode);
                 break;
             case WebConstants.FETCH_TRAIN_LIST_SERVICE:
                 ArrayList<HashMap> list = (ArrayList<HashMap>) dataSnapshot.getValue();
@@ -50,7 +49,7 @@ public class FirebaseValueEventListener implements ValueEventListener {
     @Override
     public void onCancelled(DatabaseError databaseError) {
         switch (serviceCode) {
-            case WebConstants.FETCH_SERVING_STATIONS_SERVICE:
+            case WebConstants.FETCH_CONFIG_SERVICE:
                 servingStationsListener.onFailureFetchServingStations(databaseError.getCode(), serviceCode, databaseError.getMessage());
                 break;
             case WebConstants.FETCH_TRAIN_LIST_SERVICE:

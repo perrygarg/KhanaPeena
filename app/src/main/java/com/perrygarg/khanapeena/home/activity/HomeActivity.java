@@ -79,7 +79,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
         });
 
 
-        fetchServingStationsFromFirebase();
+        fetchConfigFromFirebase();
 
         fetchTrainListFromFirebase();
     }
@@ -92,8 +92,8 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
         homePresenter.fetchRouteOfSelectedTrain(train1);
     }
 
-    private void fetchServingStationsFromFirebase() {
-        homePresenter.fetchServingStations();
+    private void fetchConfigFromFirebase() {
+        homePresenter.fetchConfigFromFirebase();
     }
 
     DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
@@ -147,7 +147,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
                 trainProgress.setVisibility(View.VISIBLE);
                 break;
             case WebConstants.FETCH_TRAIN_LIST_SERVICE:
-            case WebConstants.FETCH_SERVING_STATIONS_SERVICE:
+            case WebConstants.FETCH_CONFIG_SERVICE:
                 if(dialog == null) {
                     dialog = UIUtil.showProgressDialog(this, getString(R.string.progress_title), getString(R.string.progress_message), true, false);
                 } else {
@@ -171,7 +171,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
             case WebConstants.WS_CODE_TRAIN_AUTOCOMPLETE:
                 trainProgress.setVisibility(View.INVISIBLE);
                 break;
-            case WebConstants.FETCH_SERVING_STATIONS_SERVICE:
+            case WebConstants.FETCH_CONFIG_SERVICE:
             case WebConstants.FETCH_TRAIN_LIST_SERVICE:
             case WebConstants.CHECK_TRAIN_LIVE_API_SERVICE:
             case WebConstants.FETCH_TRAIN_ROUTE_SERVICE:
