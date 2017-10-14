@@ -283,7 +283,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
     }
 
     private void clickOnProceedButton() {
-        //perry left here
+        //perry left here test
         if(!selectedTrainNumber.isEmpty() && !selectedStationCode.isEmpty() && !selectedDate.isEmpty()) {
             if(selectedDateLiesInFuture(selectedDate)) {
                 goToNextScreen();
