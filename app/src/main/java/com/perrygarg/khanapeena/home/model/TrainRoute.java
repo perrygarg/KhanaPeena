@@ -23,4 +23,10 @@ public class TrainRoute {
     @SerializedName("fullname")
     public String stationFullName;
 
+    @SerializedName("scharr")
+    public String schArrival;
+
+    @SerializedName("schdep")
+    public String schDeparture;
+
 }

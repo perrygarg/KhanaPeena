@@ -85,6 +85,114 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
     }
 
     @Override
+    public boolean isTimeValidated(String selectedStationCode, String selectedDate, boolean viaSchedule) {
+        if(viaSchedule) {
+            if(servingTimeValidated(viaSchedule) && marginalTimeValidated(selectedStationCode, selectedDate, viaSchedule)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false; // check live API
+        }
+    }
+
+    private boolean marginalTimeValidated(String selectedStationCode, String selectedDate, boolean viaSchedule) {
+        if (viaSchedule) {
+            int minMarginTime = config.time_prior_to_order;
+            for (int i = 0; i < routes.size(); i++) {
+                TrainRoute route = routes.get(i);
+                if (route.stationCode.equalsIgnoreCase(selectedStationCode)) {
+                    if (i == 0) { //selected station is source station
+                        String schDepartureTime = route.schDeparture;
+                        String[] schDepTime = schDepartureTime.split(":");
+                        Calendar calendar = Calendar.getInstance();
+                        int year = calendar.get(Calendar.YEAR);
+                        int month = calendar.get(Calendar.MONTH);
+                        int date = calendar.get(Calendar.DATE);
+                        calendar.set(year, month, date, Integer.parseInt(schDepTime[0]), Integer.parseInt(schDepTime[1]));
+                        long depTimeMillis = calendar.getTime().getTime();
+                        Calendar calendar1 = Calendar.getInstance();
+                        long currTimeMillis = calendar1.getTime().getTime();
+                        long difference = depTimeMillis - currTimeMillis;
+                        if (Math.signum(difference) >= 1.0f) {
+                            long differenceMin = difference / 1000 / 60;
+                            if (difference >= config.time_prior_to_order) {
+                                return true;
+                            } else { //perry 15 oct 11:30pm
+                                return false;
+                            }
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        //selected station is not source station
+                    }
+                }
+            }
+        } else {
+            //if not via schedule
+            return false;
+        }
+        return false;
+    }
+
+
+//        if(currentStation != null) {
+//            Calendar calendar = Calendar.getInstance();
+//            Date formattedArrDate = null;
+//
+//            String arrivalDate = currentStation.actualArrivalDate;
+//            arrivalDate = arrivalDate.replaceAll(" ", "-");
+//            String arrivalTime = currentStation.actualArrivalTime;
+//            String[] arrivalDateSplit = arrivalDate.split("-");
+//            String month = arrivalDateSplit[1];
+//            String date = arrivalDateSplit[0];
+//            String year = arrivalDateSplit[2];
+//            String[] arrTimeSplit = arrivalTime.split(":");
+//            String hour = arrTimeSplit[0];
+//            String min = arrTimeSplit[1];
+//            DateFormat format = new SimpleDateFormat("MMM dd HH:mm:ss yyyy", Locale.US);
+//            try {
+//                //perry
+//                formattedArrDate = format.parse(month + " " + date + " " + hour + ":" + min + ":00" + " " + year);
+//                Log.d("", "");
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//            }
+//
+//            Date formattedCurrDate = calendar.getTime();
+//
+//            if(formattedCurrDate.before(formattedArrDate)) {
+//                return true;
+//            } else {
+//                long difference = formattedArrDate.getTime() - formattedCurrDate.getTime();
+//                if(Math.signum(difference) >= 1.0f) {
+//                    long differenceMin = difference/1000/60;
+//                    if(difference >= 60) {
+//                        return true;
+//                    } else {
+//                        return false;
+//                    }
+//                } else {
+//                    return false;
+//                }
+//            }
+//
+//        }
+//        return false;
+//    }
+
+    private boolean servingTimeValidated(boolean viaSchedule) {
+        return false;
+    }
+
+    @Override
+    public boolean selectedStationIsSourceStation(String selectedStationCode) {
+        return routes.get(0).stationCode.equalsIgnoreCase(selectedStationCode);
+    }
+
+    @Override
     public void onServiceBegin(int taskCode) {
 
     }
@@ -305,4 +413,5 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
     public void onFailureFetchTrainList(int code, int serviceCode, String message) {
 
     }
+
 }

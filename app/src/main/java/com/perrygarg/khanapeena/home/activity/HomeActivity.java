@@ -285,12 +285,26 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
     private void clickOnProceedButton() {
         //perry left here test
         if(!selectedTrainNumber.isEmpty() && !selectedStationCode.isEmpty() && !selectedDate.isEmpty()) {
+            if(selectedStationIsSourceStation(this.selectedStationCode)) {
+                if(isTimeValidated(this.selectedStationCode, this.selectedDate)) {
+
+                }
+            }
+
             if(selectedDateLiesInFuture(selectedDate)) {
                 goToNextScreen();
             } else {
                 checkTrainRunAheadViaLiveAPI(selectedTrainNumber, selectedDate, selectedStationCode);
             }
         }
+    }
+
+    private boolean isTimeValidated(String selectedStationCode, String selectedDate) {
+        return homePresenter.isTimeValidated(selectedStationCode, selectedDate, true);
+    }
+
+    private boolean selectedStationIsSourceStation(String selectedStationCode) {
+        return homePresenter.selectedStationIsSourceStation(selectedStationCode);
     }
 
     private void goToNextScreen() {

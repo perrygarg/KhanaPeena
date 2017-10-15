@@ -42,6 +42,10 @@ public interface HomeContract {
         void checkTrainRunAheadViaLiveAPI(String selectedTrainNumber, String selectedDate, String selectedStationCode);
 
         void fetchTrainList();
+
+        boolean isTimeValidated(String selectedStationCode, String selectedDate, boolean viaSchedule);
+
+        boolean selectedStationIsSourceStation(String selectedStationCode);
     }
 
 }
