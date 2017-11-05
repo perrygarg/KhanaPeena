@@ -32,4 +32,7 @@ public class CurrentStation {
     @SerializedName("station")
     public Station station;
 
+    @SerializedName("day")
+    public int day;
+
 }

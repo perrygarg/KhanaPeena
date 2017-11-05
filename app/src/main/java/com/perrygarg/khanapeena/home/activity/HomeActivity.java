@@ -237,8 +237,13 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
         if(shouldProceed) {
             goToNextScreen();
         } else {
-            //check gps new code
+            showToastMessage(getString(R.string.time_error));
         }
+    }
+
+    @Override
+    public void onFailureCheckTrainRunAheadViaLiveAPI(int errCode) {
+        //check gps
     }
 
     @Override
@@ -297,13 +302,13 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
         //perry left here test
         if(!selectedTrainNumber.isEmpty() && !selectedStationCode.isEmpty() && !selectedDate.isEmpty()) {
             if(isSelectedDateInFuture(selectedDate, selectedStationCode)) {
-                if(isTimeValidated(this.selectedStationCode, this.selectedDate, true)) {
+                if(isScheduledTimeValidated(this.selectedStationCode, this.selectedDate, false)) {
                     goToNextScreen();
                 } else {
                     showToastMessage(getString(R.string.time_error));
                 }
             } else if(selectedStationIsSourceStation(this.selectedStationCode)) {
-                    if(isTimeValidated(this.selectedStationCode, this.selectedDate, true)) {
+                    if(isScheduledTimeValidated(this.selectedStationCode, this.selectedDate, true)) {
                         goToNextScreen();
                     } else {
                         showToastMessage(getString(R.string.time_error));
@@ -326,8 +331,8 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
         return !homePresenter.isSelectedDateTodaysDate(selectedDate);
     }
 
-    private boolean isTimeValidated(String selectedStationCode, String selectedDate, boolean isSelectedStationSource) {
-        return homePresenter.isTimeValidated(selectedStationCode, selectedDate, isSelectedStationSource);
+    private boolean isScheduledTimeValidated(String selectedStationCode, String selectedDate, boolean isSelectedStationSource) {
+        return homePresenter.isScheduledTimeValidated(selectedStationCode, selectedDate, isSelectedStationSource);
     }
 
     private boolean selectedStationIsSourceStation(String selectedStationCode) {

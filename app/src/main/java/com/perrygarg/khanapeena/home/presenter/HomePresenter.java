@@ -85,20 +85,11 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
     }
 
     @Override
-    public boolean isTimeValidated(String selectedStationCode, String selectedDate, boolean isSelectedStationSource) {
-//        if(viaSchedule) {
-//            if(servingTimeValidated(viaSchedule) && marginalTimeValidated(selectedStationCode, selectedDate, viaSchedule)) {
-//                return true;
-//            } else {
-//                return false;
-//            }
-//        } else {
-//            return false; // check live API
-//        }
-        return servingTimeValidated(selectedStationCode) && marginalTimeValidated(selectedStationCode, selectedDate, isSelectedStationSource);
+    public boolean isScheduledTimeValidated(String selectedStationCode, String selectedDate, boolean isSelectedStationSource) {
+        return scheduledServingTimeValidated(selectedStationCode) && scheduledMarginalTimeValidated(selectedStationCode, selectedDate, isSelectedStationSource);
     }
 
-    private boolean marginalTimeValidated(String selectedStationCode, String selectedDate, boolean isSelectedStationSource) {
+    private boolean scheduledMarginalTimeValidated(String selectedStationCode, String selectedDate, boolean isSelectedStationSource) {
         if (!isSelectedDateTodaysDate(selectedDate)) {
             return true;
         } else {
@@ -219,7 +210,7 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
 //        return false;
 //    }
 
-    private boolean servingTimeValidated(String selectedStationCode) {
+    private boolean scheduledServingTimeValidated(String selectedStationCode) {
         String schDepartureTime = null;
         for (int i = 0; i < routes.size(); i++) {
             TrainRoute route = routes.get(i);
@@ -290,7 +281,7 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
                         break;
                     }
                 }
-                if (trainIsAtleast60MinsBehind(actStation)) {
+                if (isTimeValidatedViaLiveApi(actStation)) {
                     view.hideProgress(taskCode);
                     view.onSuccessCheckTrainRunAheadViaLiveAPI(true);
                 } else {
@@ -302,7 +293,7 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
 
     }
 
-    private boolean trainIsAtleast60MinsBehind(CurrentStation currentStation) {
+    private boolean isTimeValidatedViaLiveApi(CurrentStation currentStation) {
         if (currentStation != null) {
             Calendar calendar = Calendar.getInstance();
             Date formattedArrDate = null;
@@ -329,13 +320,13 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
             Date formattedCurrDate = calendar.getTime();
 
             if (formattedCurrDate.before(formattedArrDate)) {
-                return true;
+                return liveServingTimeValidated(hour);
             } else {
                 long difference = formattedArrDate.getTime() - formattedCurrDate.getTime();
                 if (Math.signum(difference) >= 1.0f) {
                     long differenceMin = difference / 1000 / 60;
-                    if (difference >= 60) {
-                        return true;
+                    if (differenceMin >= config.time_prior_to_order) {
+                        return liveServingTimeValidated(hour);
                     } else {
                         return false;
                     }
@@ -344,8 +335,22 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
                 }
             }
 
+        } else {
+            return false;
         }
-        return false;
+    }
+
+    private boolean liveServingTimeValidated(String hours) {
+        if (hours != null) {
+            int hour = Integer.parseInt(hours);
+            if (hour >= config.serving_start_timing && hour < config.serving_end_timing) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
     public void manipulateDatesInDatePicker(String selectedStationCode) {
@@ -365,11 +370,11 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
 
         for (Day day : days) {
             if (day.runs.equals("N")) {
-                UIUtil.showToast(day.dayCode);
+//                UIUtil.showToast(day.dayCode);
                 int d = AppUtil.getWeekDayOfWeek(day.dayCode);
                 int finalDay = AppUtil.shiftDesiredDays(d, dayOfReachingStation - 1);
                 notRunningDays.add(AppUtil.getDayOfWeekModified(finalDay));
-                UIUtil.showToast(AppUtil.getDayOfWeekModified(finalDay));
+//                UIUtil.showToast(AppUtil.getDayOfWeekModified(finalDay));
             }
         }
 
@@ -441,7 +446,7 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
                 //live API didn't work
                 view.hideProgress(taskCode);
                 view.showToastMessage("Live API didn't work");
-                view.onSuccessCheckTrainRunAheadViaLiveAPI(false);
+                view.onFailureCheckTrainRunAheadViaLiveAPI(errorType);
                 break;
             default:
                 view.hideProgress(taskCode);

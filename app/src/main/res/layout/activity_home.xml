@@ -100,7 +100,7 @@
                     android:layout_marginTop="@dimen/margin_left_home"
                     android:focusable="false"
                     android:focusableInTouchMode="false"
-                    android:editable="false"
+                    android:inputType="number"
                     android:hint="Enter PNR number"/>
 
                 <!-- <include

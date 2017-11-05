@@ -29,6 +29,8 @@ public interface HomeContract {
 
         void onSuccessCheckTrainRunAheadViaLiveAPI(boolean shouldProceed);
 
+        void onFailureCheckTrainRunAheadViaLiveAPI(int errCode);
+
         void onSuccessFetchTrainList(ArrayList<Train> trainList);
 
         void resetView();
@@ -47,7 +49,7 @@ public interface HomeContract {
 
         void fetchTrainList();
 
-        boolean isTimeValidated(String selectedStationCode, String selectedDate, boolean viaSchedule);
+        boolean isScheduledTimeValidated(String selectedStationCode, String selectedDate, boolean viaSchedule);
 
         boolean selectedStationIsSourceStation(String selectedStationCode);
     }
