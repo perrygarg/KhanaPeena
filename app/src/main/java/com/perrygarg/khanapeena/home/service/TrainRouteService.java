@@ -1,6 +1,7 @@
 package com.perrygarg.khanapeena.home.service;
 
 import com.android.volley.Request;
+import com.perrygarg.khanapeena.R;
 import com.perrygarg.khanapeena.application.MyApplication;
 import com.perrygarg.khanapeena.common.network.AppHttpClient;
 import com.perrygarg.khanapeena.common.network.WebConstants;
@@ -33,7 +34,11 @@ public class TrainRouteService extends WebService {
     public void onResponse(Object object)
     {
         TrainRouteResponse response = (TrainRouteResponse) object;
-        serviceListener.onServiceSuccess(response, WebConstants.FETCH_TRAIN_ROUTE_SERVICE);
+        if(response.responseCode == 200) {
+            serviceListener.onServiceSuccess(response, WebConstants.FETCH_TRAIN_ROUTE_SERVICE);
+        } else {
+            serviceListener.onServiceError(MyApplication.appContext.getString(R.string.api_err_msg), WebConstants.FETCH_TRAIN_ROUTE_SERVICE, response.responseCode);
+        }
     }
 
 }

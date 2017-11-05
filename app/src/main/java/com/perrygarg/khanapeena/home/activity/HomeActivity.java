@@ -228,8 +228,8 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
     }
 
     @Override
-    public void showToastMessage(int taskCode) {
-        UIUtil.showToast("Live API didn't work");
+    public void showToastMessage(String msg) {
+        UIUtil.showToast(msg);
     }
 
     @Override
@@ -237,13 +237,24 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
         if(shouldProceed) {
             goToNextScreen();
         } else {
-            showError(getString(R.string.order_impossible_error));
+            //check gps new code
         }
     }
 
     @Override
     public void onSuccessFetchTrainList(ArrayList<Train> trainList) {
         adapter.setTrainsListInstance(trainList);
+    }
+
+    @Override
+    public void resetView() {
+        train.setText("");
+        train.setEnabled(true);
+        datePickerText.setText("");
+        datePickerText.setEnabled(false);
+        mealStations.setEnabled(false);
+        mealStations.setSelection(0);
+        proceedBtn.setEnabled(false);
     }
 
     private void updateLabel() {
@@ -285,22 +296,38 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
     private void clickOnProceedButton() {
         //perry left here test
         if(!selectedTrainNumber.isEmpty() && !selectedStationCode.isEmpty() && !selectedDate.isEmpty()) {
-            if(selectedStationIsSourceStation(this.selectedStationCode)) {
-                if(isTimeValidated(this.selectedStationCode, this.selectedDate)) {
-
+            if(isSelectedDateInFuture(selectedDate, selectedStationCode)) {
+                if(isTimeValidated(this.selectedStationCode, this.selectedDate, true)) {
+                    goToNextScreen();
+                } else {
+                    showToastMessage(getString(R.string.time_error));
                 }
-            }
-
-            if(selectedDateLiesInFuture(selectedDate)) {
-                goToNextScreen();
+            } else if(selectedStationIsSourceStation(this.selectedStationCode)) {
+                    if(isTimeValidated(this.selectedStationCode, this.selectedDate, true)) {
+                        goToNextScreen();
+                    } else {
+                        showToastMessage(getString(R.string.time_error));
+                    }
             } else {
                 checkTrainRunAheadViaLiveAPI(selectedTrainNumber, selectedDate, selectedStationCode);
             }
+
+
+
+//            if(selectedDateLiesInFuture(selectedDate)) {
+//                goToNextScreen();
+//            } else {
+//                checkTrainRunAheadViaLiveAPI(selectedTrainNumber, selectedDate, selectedStationCode);
+//            }
         }
     }
 
-    private boolean isTimeValidated(String selectedStationCode, String selectedDate) {
-        return homePresenter.isTimeValidated(selectedStationCode, selectedDate, true);
+    private boolean isSelectedDateInFuture(String selectedDate, String selectedStationCode) {
+        return !homePresenter.isSelectedDateTodaysDate(selectedDate);
+    }
+
+    private boolean isTimeValidated(String selectedStationCode, String selectedDate, boolean isSelectedStationSource) {
+        return homePresenter.isTimeValidated(selectedStationCode, selectedDate, isSelectedStationSource);
     }
 
     private boolean selectedStationIsSourceStation(String selectedStationCode) {
@@ -308,7 +335,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
     }
 
     private void goToNextScreen() {
-        UIUtil.showToast("Next Screen");
+//        UIUtil.showToast("Next Screen");
         Intent intent = new Intent(HomeActivity.this, FoodListingActivity.class);
         startActivity(intent);
     }

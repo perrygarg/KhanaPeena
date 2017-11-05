@@ -25,14 +25,18 @@ public interface HomeContract {
 
         void disableDates(Calendar[] disabledDates, boolean highlightToday);
 
-        void showToastMessage(int taskCode);
+        void showToastMessage(String msg);
 
         void onSuccessCheckTrainRunAheadViaLiveAPI(boolean shouldProceed);
 
         void onSuccessFetchTrainList(ArrayList<Train> trainList);
+
+        void resetView();
     }
 
     interface Presenter {
+        boolean isSelectedDateTodaysDate(String selectedDate);
+
         void fetchAutoCompleteTrainList(String partialTrainInfo);
 
         void fetchRouteOfSelectedTrain(Train train);

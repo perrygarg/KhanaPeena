@@ -85,56 +85,92 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
     }
 
     @Override
-    public boolean isTimeValidated(String selectedStationCode, String selectedDate, boolean viaSchedule) {
-        if(viaSchedule) {
-            if(servingTimeValidated(viaSchedule) && marginalTimeValidated(selectedStationCode, selectedDate, viaSchedule)) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false; // check live API
-        }
+    public boolean isTimeValidated(String selectedStationCode, String selectedDate, boolean isSelectedStationSource) {
+//        if(viaSchedule) {
+//            if(servingTimeValidated(viaSchedule) && marginalTimeValidated(selectedStationCode, selectedDate, viaSchedule)) {
+//                return true;
+//            } else {
+//                return false;
+//            }
+//        } else {
+//            return false; // check live API
+//        }
+        return servingTimeValidated(selectedStationCode) && marginalTimeValidated(selectedStationCode, selectedDate, isSelectedStationSource);
     }
 
-    private boolean marginalTimeValidated(String selectedStationCode, String selectedDate, boolean viaSchedule) {
-        if (viaSchedule) {
-            int minMarginTime = config.time_prior_to_order;
-            for (int i = 0; i < routes.size(); i++) {
-                TrainRoute route = routes.get(i);
-                if (route.stationCode.equalsIgnoreCase(selectedStationCode)) {
-                    if (i == 0) { //selected station is source station
-                        String schDepartureTime = route.schDeparture;
-                        String[] schDepTime = schDepartureTime.split(":");
-                        Calendar calendar = Calendar.getInstance();
-                        int year = calendar.get(Calendar.YEAR);
-                        int month = calendar.get(Calendar.MONTH);
-                        int date = calendar.get(Calendar.DATE);
-                        calendar.set(year, month, date, Integer.parseInt(schDepTime[0]), Integer.parseInt(schDepTime[1]));
-                        long depTimeMillis = calendar.getTime().getTime();
-                        Calendar calendar1 = Calendar.getInstance();
-                        long currTimeMillis = calendar1.getTime().getTime();
-                        long difference = depTimeMillis - currTimeMillis;
-                        if (Math.signum(difference) >= 1.0f) {
-                            long differenceMin = difference / 1000 / 60;
-                            if (difference >= config.time_prior_to_order) {
-                                return true;
-                            } else { //perry 15 oct 11:30pm
-                                return false;
-                            }
+    private boolean marginalTimeValidated(String selectedStationCode, String selectedDate, boolean isSelectedStationSource) {
+        if (!isSelectedDateTodaysDate(selectedDate)) {
+            return true;
+        } else {
+            String schDepartureTime = null;
+            if (isSelectedStationSource) {
+                schDepartureTime = routes.get(0).schDeparture;
+            } else {
+                for (int i = 0; i < routes.size(); i++) {
+                    TrainRoute route = routes.get(i);
+                    if (route.stationCode.equalsIgnoreCase(selectedStationCode)) {
+                        if (i == routes.size() - 1) {
+                            schDepartureTime = route.schArrival;
                         } else {
-                            return false;
+                            schDepartureTime = route.schDeparture;
                         }
-                    } else {
-                        //selected station is not source station
+                        break;
                     }
                 }
             }
-        } else {
-            //if not via schedule
-            return false;
+
+            if (schDepartureTime != null) {
+                String[] schDepTime = schDepartureTime.split(":");
+                Calendar calendar = Calendar.getInstance();
+                int year = calendar.get(Calendar.YEAR);
+                int month = calendar.get(Calendar.MONTH);
+                int date = calendar.get(Calendar.DATE);
+                calendar.set(year, month, date, Integer.parseInt(schDepTime[0]), Integer.parseInt(schDepTime[1]));
+                long depTimeMillis = calendar.getTime().getTime();
+                Calendar calendar1 = Calendar.getInstance();
+                long currTimeMillis = calendar1.getTime().getTime();
+                long difference = depTimeMillis - currTimeMillis;
+                if (Math.signum(difference) >= 1.0f) {
+                    long differenceMin = difference / 1000 / 60;
+                    if (differenceMin >= config.time_prior_to_order) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
         }
-        return false;
+    }
+
+    @Override
+    public boolean isSelectedDateTodaysDate(String selectedDate) {
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+
+        Date today = c.getTime();
+
+        String myFormat = "dd-MM-yyyy"; //In which you need put here
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.ENGLISH);
+        try {
+            c.setTime(sdf.parse(selectedDate));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        Date dateSpecified = c.getTime();
+
+        if (dateSpecified.after(today)) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
 
@@ -183,8 +219,31 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
 //        return false;
 //    }
 
-    private boolean servingTimeValidated(boolean viaSchedule) {
-        return false;
+    private boolean servingTimeValidated(String selectedStationCode) {
+        String schDepartureTime = null;
+        for (int i = 0; i < routes.size(); i++) {
+            TrainRoute route = routes.get(i);
+            if (route.stationCode.equalsIgnoreCase(selectedStationCode)) {
+                if (i == routes.size() - 1) {
+                    schDepartureTime = route.schArrival;
+                } else {
+                    schDepartureTime = route.schDeparture;
+                }
+                break;
+            }
+        }
+
+        if (schDepartureTime != null) {
+            String[] schDepTime = schDepartureTime.split(":");
+            int hour = Integer.parseInt(schDepTime[0]);
+            if (hour >= config.serving_start_timing && hour < config.serving_end_timing) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -201,9 +260,9 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
     public void onServiceSuccess(MasterResponse masterResponse, int taskCode) {
         switch (taskCode) {
             case WebConstants.WS_CODE_TRAIN_AUTOCOMPLETE:
-                Train[] trains = ((TrainAutoCompleteResponse)masterResponse).train;
-                int totalTrains = ((TrainAutoCompleteResponse)masterResponse).total;
-                if(totalTrains > 5) {
+                Train[] trains = ((TrainAutoCompleteResponse) masterResponse).train;
+                int totalTrains = ((TrainAutoCompleteResponse) masterResponse).total;
+                if (totalTrains > 5) {
 //            totalTrains = 5;
                 }
                 ArrayList<Train> trainList = new ArrayList<>();
@@ -215,8 +274,8 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
                 break;
 
             case WebConstants.FETCH_TRAIN_ROUTE_SERVICE:
-                TrainRoute[] route = ((TrainRouteResponse)masterResponse).trainRoute;
-                trainDays = ((TrainRouteResponse)masterResponse).trainDays;
+                TrainRoute[] route = ((TrainRouteResponse) masterResponse).trainRoute;
+                trainDays = ((TrainRouteResponse) masterResponse).trainDays;
                 routes = new ArrayList<>(Arrays.asList(route));
 //                manipulateDatesInDatePicker(trainDays, routes);
                 calculateIntersectionStations(config.stations_served, routes);
@@ -224,14 +283,14 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
 
             case WebConstants.CHECK_TRAIN_LIVE_API_SERVICE:
                 CurrentStation actStation = null;
-                CurrentStation currentStation[] = ((TrainLiveStatusResponse)masterResponse).liveRoute;
+                CurrentStation currentStation[] = ((TrainLiveStatusResponse) masterResponse).liveRoute;
                 for (CurrentStation cStation : currentStation) {
-                    if(cStation.station.stationCode.equalsIgnoreCase(this.selectedStationCode)) {
+                    if (cStation.station.stationCode.equalsIgnoreCase(this.selectedStationCode)) {
                         actStation = cStation;
                         break;
                     }
                 }
-                if(trainIsAtleast60MinsBehind(actStation)) {
+                if (trainIsAtleast60MinsBehind(actStation)) {
                     view.hideProgress(taskCode);
                     view.onSuccessCheckTrainRunAheadViaLiveAPI(true);
                 } else {
@@ -244,7 +303,7 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
     }
 
     private boolean trainIsAtleast60MinsBehind(CurrentStation currentStation) {
-        if(currentStation != null) {
+        if (currentStation != null) {
             Calendar calendar = Calendar.getInstance();
             Date formattedArrDate = null;
 
@@ -269,13 +328,13 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
 
             Date formattedCurrDate = calendar.getTime();
 
-            if(formattedCurrDate.before(formattedArrDate)) {
+            if (formattedCurrDate.before(formattedArrDate)) {
                 return true;
             } else {
                 long difference = formattedArrDate.getTime() - formattedCurrDate.getTime();
-                if(Math.signum(difference) >= 1.0f) {
-                    long differenceMin = difference/1000/60;
-                    if(difference >= 60) {
+                if (Math.signum(difference) >= 1.0f) {
+                    long differenceMin = difference / 1000 / 60;
+                    if (difference >= 60) {
                         return true;
                     } else {
                         return false;
@@ -297,15 +356,15 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
         int dayOfReachingStation = -1;
 
         for (TrainRoute route : routes) {
-            if(route.stationCode.equalsIgnoreCase(selectedStationCode.trim())) {
+            if (route.stationCode.equalsIgnoreCase(selectedStationCode.trim())) {
                 dayOfReachingStation = route.day;
             }
         }
 
         days[4].runs = "N";
 
-        for(Day day : days) {
-            if(day.runs.equals("N")) {
+        for (Day day : days) {
+            if (day.runs.equals("N")) {
                 UIUtil.showToast(day.dayCode);
                 int d = AppUtil.getWeekDayOfWeek(day.dayCode);
                 int finalDay = AppUtil.shiftDesiredDays(d, dayOfReachingStation - 1);
@@ -324,15 +383,15 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
 
         int fromMonth = fromCalendar.get(Calendar.MONTH);
         int toMonth = toCalendar.get(Calendar.MONTH);
-        for(int i = fromMonth; i <= toMonth; i++) {
+        for (int i = fromMonth; i <= toMonth; i++) {
             int totalDays;
             int startDate = 1;
-            if(i == fromMonth) {
+            if (i == fromMonth) {
                 Calendar cal = Calendar.getInstance();
                 cal.set(fromCalendar.get(Calendar.YEAR), i, fromCalendar.get(Calendar.DATE));
                 totalDays = cal.getActualMaximum(Calendar.DATE);
                 startDate = cal.get(Calendar.DATE);
-            } else if(i == toMonth) {
+            } else if (i == toMonth) {
                 Calendar cal = Calendar.getInstance();
                 cal.set(toCalendar.get(Calendar.YEAR), i, toCalendar.get(Calendar.DATE));
                 totalDays = cal.get(Calendar.DATE);
@@ -346,8 +405,8 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
             for (int ii = startDate; ii <= totalDays; ii++) {
                 Calendar tempCal = Calendar.getInstance();
                 tempCal.set(toCalendar.get(Calendar.YEAR), i, ii);
-                if(notRunningDays.contains(AppUtil.getDayOfWeek(tempCal.get(Calendar.DAY_OF_WEEK)))) {
-                    if(ii == (int)fromCalendar.get(Calendar.DATE) && i == fromCalendar.get(Calendar.MONTH)) {
+                if (notRunningDays.contains(AppUtil.getDayOfWeek(tempCal.get(Calendar.DAY_OF_WEEK)))) {
+                    if (ii == (int) fromCalendar.get(Calendar.DATE) && i == fromCalendar.get(Calendar.MONTH)) {
                         highlightToday = true;
                     } else {
                         invalidCalendars.add(tempCal);
@@ -364,9 +423,9 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
 
     private void calculateIntersectionStations(ArrayList<String> servingStationCodes, ArrayList<TrainRoute> routes) {
         ArrayList<TrainRoute> intersectionStations = new ArrayList<>();
-        if(servingStationCodes != null && routes != null) {
+        if (servingStationCodes != null && routes != null) {
             for (TrainRoute route : routes) {
-                if(servingStationCodes.contains(route.stationCode)) {
+                if (servingStationCodes.contains(route.stationCode)) {
                     intersectionStations.add(route);
                 }
             }
@@ -381,8 +440,13 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
             case WebConstants.CHECK_TRAIN_LIVE_API_SERVICE:
                 //live API didn't work
                 view.hideProgress(taskCode);
-                view.showToastMessage(taskCode);
-                view.onSuccessCheckTrainRunAheadViaLiveAPI(true);
+                view.showToastMessage("Live API didn't work");
+                view.onSuccessCheckTrainRunAheadViaLiveAPI(false);
+                break;
+            default:
+                view.hideProgress(taskCode);
+                view.showToastMessage(message);
+                view.resetView();
                 break;
         }
     }

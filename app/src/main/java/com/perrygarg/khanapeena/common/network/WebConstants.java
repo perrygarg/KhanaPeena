@@ -15,7 +15,7 @@ public interface WebConstants {
     int CHECK_TRAIN_LIVE_API_SERVICE = 4;
     int FETCH_TRAIN_LIST_SERVICE = 5;
 
-    String RAIL_API_KEY = "/apikey/m4h2fi5539";
+    String RAIL_API_KEY = "/apikey/9j84jda4h1";
     String VERSION = "v2/";
     String DATE = "/date/";
 
