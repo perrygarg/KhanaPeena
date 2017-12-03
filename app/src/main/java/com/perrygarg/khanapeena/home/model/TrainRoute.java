@@ -8,20 +8,11 @@ import com.google.gson.annotations.SerializedName;
 
 public class TrainRoute {
 
-    @SerializedName("lat")
-    public float lat;
-
-    @SerializedName("lng")
-    public float lang;
+    @SerializedName("station")
+    public RouteStation routeStation;
 
     @SerializedName("day")
     public int day;
-
-    @SerializedName("code")
-    public String stationCode;
-
-    @SerializedName("fullname")
-    public String stationFullName;
 
     @SerializedName("scharr")
     public String schArrival;

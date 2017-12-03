@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Khana Peena</string>
+    <string name="app_name">Oye Dhaba</string>
 
     <!-- Error Messages for Volley-->
     <string name="error_time_out">Seems the connection timed out</string>

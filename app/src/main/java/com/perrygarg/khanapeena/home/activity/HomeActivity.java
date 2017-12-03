@@ -14,6 +14,7 @@ import android.widget.ProgressBar;
 import com.perrygarg.khanapeena.R;
 import com.perrygarg.khanapeena.common.activity.BaseActivity;
 import com.perrygarg.khanapeena.common.network.WebConstants;
+import com.perrygarg.khanapeena.common.util.AppLogs;
 import com.perrygarg.khanapeena.common.util.DelayAutocompleteTextView;
 import com.perrygarg.khanapeena.common.util.UIUtil;
 import com.perrygarg.khanapeena.foodlisting.activity.FoodListingActivity;
@@ -49,6 +50,8 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
     ArrayList<TrainRoute> intersectionStations = new ArrayList<>();
     private Calendar[] disabledDates;
     private boolean highlightToday = false;
+    private EditText pnrEditText;
+    private boolean IS_IN_TESTING_MODE = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,10 +81,10 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
             }
         });
 
-
         fetchConfigFromFirebase();
 
         fetchTrainListFromFirebase();
+
     }
 
     private void fetchTrainListFromFirebase() {
@@ -129,15 +132,17 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
     }
 
     private void findViewsByIds() {
-        train = findViewById(R.id.train);
-        mealStations = findViewById(R.id.meal_stations);
+        train = findViewById(R.id.train_number_edit_text);
+        mealStations = findViewById(R.id.meal_stations_spinner);
         trainProgress = findViewById(R.id.train_progress_bar);
         datePickerText = findViewById(R.id.date_picker_edit_text);
         proceedBtn = findViewById(R.id.proceed_button);
+        pnrEditText = findViewById(R.id.pnr_number_edit_text);
 
         mealStations.setEnabled(false);
         datePickerText.setEnabled(false);
         proceedBtn.setEnabled(false);
+        pnrEditText.setEnabled(true);
     }
 
     @Override
@@ -209,11 +214,12 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
 
     @Override
     public void setIntersectionStations(ArrayList<TrainRoute> intersectionStations) {
+        pnrEditText.setEnabled(false);
         mealStations.setEnabled(true);
         this.intersectionStations = intersectionStations;
         availableStationNames.removeAll(availableStationNames);
         for (TrainRoute route : intersectionStations) {
-            availableStationNames.add(route.stationFullName);
+            availableStationNames.add(route.routeStation.stationFullName);
         }
         availableStationNames.add(0, getString(R.string.select_delivery_station));
         aa.notifyDataSetChanged();
@@ -358,8 +364,8 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Vie
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         if(i != 0) {
             for(TrainRoute route : intersectionStations) {
-                if(route.stationFullName.equals(availableStationNames.get(i))) {
-                    selectedStationCode = route.stationCode;
+                if(route.routeStation.stationFullName.equals(availableStationNames.get(i))) {
+                    selectedStationCode = route.routeStation.stationCode;
                     homePresenter.manipulateDatesInDatePicker(selectedStationCode);
                     datePickerText.setEnabled(true);
                     break;

@@ -43,65 +43,53 @@
                 android:layout_gravity="center"
                 android:orientation="vertical">
 
-                <FrameLayout android:layout_width="match_parent"
+                <FrameLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/cardview_default_radius">
 
-                        <com.perrygarg.khanapeena.common.util.DelayAutocompleteTextView
-                            android:id="@+id/train"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="textCapSentences"
-                            android:hint="@string/train_name_or_number"
-                            android:layout_gravity="center_vertical"
-                            android:maxLines="1"
-                            android:textSize="14dp"
-                            android:paddingRight="@dimen/margin_left_home"
-                            android:imeOptions="flagNoExtractUi|actionSearch"/>
+                    <com.perrygarg.khanapeena.common.util.DelayAutocompleteTextView
+                        android:id="@+id/train_number_edit_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:hint="@string/train_name_or_number"
+                        android:imeOptions="flagNoExtractUi|actionSearch"
+                        android:inputType="textCapSentences"
+                        android:maxLines="1"
+                        android:paddingRight="@dimen/margin_left_home"
+                        android:textSize="14dp" />
 
-                        <ProgressBar
-                            android:id="@+id/train_progress_bar"
-                            style="?android:attr/progressBarStyleSmall"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical|right"
-                            android:layout_marginRight="@dimen/cardview_default_radius"
-                            android:visibility="invisible" />
+                    <ProgressBar
+                        android:id="@+id/train_progress_bar"
+                        style="?android:attr/progressBarStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical|right"
+                        android:layout_marginRight="@dimen/cardview_default_radius"
+                        android:visibility="gone" />
 
 
                 </FrameLayout>
-
-                <EditText
-                    android:id="@+id/date_picker_edit_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:textSize="14dp"
-                    android:layout_marginTop="@dimen/margin_left_home"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
-                    android:editable="false"
-                    android:hint="Tap to choose journey date"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_margin="10dp"
-                    android:textStyle="bold"
-                    android:text="OR"/>
+                    android:text="OR"
+                    android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/pnr_number_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clickable="true"
-                    android:textSize="14dp"
-                    android:layout_marginTop="@dimen/margin_left_home"
                     android:focusable="false"
                     android:focusableInTouchMode="false"
+                    android:hint="Enter PNR number"
                     android:inputType="number"
-                    android:hint="Enter PNR number"/>
+                    android:textSize="14dp" />
 
                 <!-- <include
                      android:id="@+id/proceedLayout"
@@ -109,8 +97,7 @@
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
-        <android.support.v7.widget.CardView
-            xmlns:android="http://schemas.android.com/apk/res/android"
+        <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:id="@+id/cardViewSecond"
             android:layout_width="match_parent"
@@ -128,29 +115,40 @@
                 android:layout_gravity="center"
                 android:orientation="vertical">
 
-            <android.support.v7.widget.AppCompatSpinner
-                android:id="@+id/meal_stations"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/activity_vertical_margin" />
+                <android.support.v7.widget.AppCompatSpinner
+                    android:id="@+id/meal_stations_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/activity_vertical_margin" />
 
-            <Button
-                android:id="@+id/proceed_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:background="@drawable/selector__button_proceed"
-                android:gravity="center"
-                android:text="@string/proceed"
-                android:textColor="@android:color/white"
-                android:textSize="14dp" />
+                <EditText
+                    android:id="@+id/date_picker_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_left_home"
+                    android:clickable="true"
+                    android:editable="false"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:hint="Tap to choose journey date"
+                    android:textSize="14dp" />
 
             </LinearLayout>
 
         </android.support.v7.widget.CardView>
+
+        <Button
+            android:id="@+id/proceed_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/selector__button_proceed"
+            android:gravity="center"
+            android:text="@string/proceed"
+            android:textColor="@android:color/white"
+            android:textSize="14dp" />
 
     </LinearLayout>
 

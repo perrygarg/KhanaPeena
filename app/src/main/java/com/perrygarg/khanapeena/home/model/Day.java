@@ -8,13 +8,13 @@ import com.google.gson.annotations.SerializedName;
 
 public class Day {
 
-    @SerializedName("day-code")
+    @SerializedName("code")
     public String dayCode;
 
     @SerializedName("runs")
     public String runs;
 
-    @SerializedName("code")
-    public String code;
+//    @SerializedName("code")
+//    public String code;
 
 }

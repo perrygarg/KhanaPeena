@@ -99,7 +99,7 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
             } else {
                 for (int i = 0; i < routes.size(); i++) {
                     TrainRoute route = routes.get(i);
-                    if (route.stationCode.equalsIgnoreCase(selectedStationCode)) {
+                    if (route.routeStation.stationCode.equalsIgnoreCase(selectedStationCode)) {
                         if (i == routes.size() - 1) {
                             schDepartureTime = route.schArrival;
                         } else {
@@ -214,7 +214,7 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
         String schDepartureTime = null;
         for (int i = 0; i < routes.size(); i++) {
             TrainRoute route = routes.get(i);
-            if (route.stationCode.equalsIgnoreCase(selectedStationCode)) {
+            if (route.routeStation.stationCode.equalsIgnoreCase(selectedStationCode)) {
                 if (i == routes.size() - 1) {
                     schDepartureTime = route.schArrival;
                 } else {
@@ -239,7 +239,7 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
 
     @Override
     public boolean selectedStationIsSourceStation(String selectedStationCode) {
-        return routes.get(0).stationCode.equalsIgnoreCase(selectedStationCode);
+        return routes.get(0).routeStation.stationCode.equalsIgnoreCase(selectedStationCode);
     }
 
     @Override
@@ -356,81 +356,66 @@ public class HomePresenter implements HomeContract.Presenter, WebServiceListener
     public void manipulateDatesInDatePicker(String selectedStationCode) {
         Day[] days = trainDays.day;
 
-        ArrayList<String> notRunningDays = new ArrayList<>();
-
         int dayOfReachingStation = -1;
 
         for (TrainRoute route : routes) {
-            if (route.stationCode.equalsIgnoreCase(selectedStationCode.trim())) {
+            if (route.routeStation.stationCode.equalsIgnoreCase(selectedStationCode.trim())) {
                 dayOfReachingStation = route.day;
             }
         }
 
         days[4].runs = "N";
+        days[6].runs = "N";
 
+        boolean weekDaysToDisable[] = new boolean[8]; //taking size 8 as java days works from 1-7 (SUN-SAT)
         for (Day day : days) {
             if (day.runs.equals("N")) {
-//                UIUtil.showToast(day.dayCode);
                 int d = AppUtil.getWeekDayOfWeek(day.dayCode);
                 int finalDay = AppUtil.shiftDesiredDays(d, dayOfReachingStation - 1);
-                notRunningDays.add(AppUtil.getDayOfWeekModified(finalDay));
-//                UIUtil.showToast(AppUtil.getDayOfWeekModified(finalDay));
+                weekDaysToDisable[finalDay] = true; //1 for SUN - 7 for SAT
             }
         }
-
-        ArrayList<Calendar> invalidCalendars = new ArrayList<>();
-
-        Calendar fromCalendar = Calendar.getInstance();
-        Calendar toCalendar = Calendar.getInstance();
-        toCalendar.add(Calendar.DATE, 30);
 
         boolean highlightToday = false;
 
-        int fromMonth = fromCalendar.get(Calendar.MONTH);
-        int toMonth = toCalendar.get(Calendar.MONTH);
-        for (int i = fromMonth; i <= toMonth; i++) {
-            int totalDays;
-            int startDate = 1;
-            if (i == fromMonth) {
-                Calendar cal = Calendar.getInstance();
-                cal.set(fromCalendar.get(Calendar.YEAR), i, fromCalendar.get(Calendar.DATE));
-                totalDays = cal.getActualMaximum(Calendar.DATE);
-                startDate = cal.get(Calendar.DATE);
-            } else if (i == toMonth) {
-                Calendar cal = Calendar.getInstance();
-                cal.set(toCalendar.get(Calendar.YEAR), i, toCalendar.get(Calendar.DATE));
-                totalDays = cal.get(Calendar.DATE);
-                startDate = 1;
-            } else {
-                Calendar cal = Calendar.getInstance();
-                cal.set(fromCalendar.get(Calendar.YEAR), i, 1);
-                totalDays = cal.getActualMaximum(Calendar.DATE);
-            }
-
-            for (int ii = startDate; ii <= totalDays; ii++) {
-                Calendar tempCal = Calendar.getInstance();
-                tempCal.set(toCalendar.get(Calendar.YEAR), i, ii);
-                if (notRunningDays.contains(AppUtil.getDayOfWeek(tempCal.get(Calendar.DAY_OF_WEEK)))) {
-                    if (ii == (int) fromCalendar.get(Calendar.DATE) && i == fromCalendar.get(Calendar.MONTH)) {
-                        highlightToday = true;
-                    } else {
-                        invalidCalendars.add(tempCal);
-                    }
-                }
-            }
+        Calendar today = Calendar.getInstance();
+        if(weekDaysToDisable[today.get(Calendar.DAY_OF_WEEK)]) {
+            highlightToday = true;
         }
 
-        Calendar[] disabledDates = new Calendar[invalidCalendars.size()];
-        disabledDates = invalidCalendars.toArray(disabledDates);
+        Calendar[] disabledDates = getCalendarInstancesToDisable(today, 30, weekDaysToDisable);
 
         view.disableDates(disabledDates, highlightToday);
+    }
+
+    private static Calendar[] getCalendarInstancesToDisable(Calendar cal, int totalDays, boolean[] days)
+    {
+        ArrayList<Calendar> cals = new ArrayList<>();
+
+
+        Calendar c = Calendar.getInstance();
+        c.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE));
+        Calendar n;
+        for(int i = 0; i <= totalDays; i++)
+        {
+            if(days[c.get(Calendar.DAY_OF_WEEK)]) {
+                if(i != 0) {//If day is not today
+                    n = Calendar.getInstance();
+                    n.set(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DATE));
+                    cals.add(n);
+                }
+            }
+            c.add(Calendar.DATE, 1);
+        }
+
+        return cals.toArray(new Calendar[cals.size()]);
     }
 
     private void calculateIntersectionStations(ArrayList<String> servingStationCodes, ArrayList<TrainRoute> routes) {
         ArrayList<TrainRoute> intersectionStations = new ArrayList<>();
         if (servingStationCodes != null && routes != null) {
             for (TrainRoute route : routes) {
-                if (servingStationCodes.contains(route.stationCode)) {
+                if (servingStationCodes.contains(route.routeStation.stationCode)) {
                     intersectionStations.add(route);
                 }
             }
